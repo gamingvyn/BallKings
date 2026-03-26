@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BallKings — Ultimate Basketball Card Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c14;
+  --surface: #0f1825;
+  --surface2: #16212f;
+  --border: #1e2d3d;
+  --accent: #f97316;
+  --accent2: #3b82f6;
+  --gold: #f59e0b;
+  --text: #e2e8f0;
+  --text-dim: #64748b;
+  --green: #22c55e;
+  --red: #ef4444;
+  --purple: #a855f7;
+  --teal: #14b8a6;
+  --r-base: #64748b;
+  --r-rookie: #22c55e;
+  --r-elite: #3b82f6;
+  --r-allstar: #a855f7;
+  --r-prime: #f59e0b;
+  --r-legend: #f97316;
+  --r-icon: #ec4899;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;}
+.font-display{font-family:'Bebas Neue',cursive;}
+.font-cond{font-family:'Barlow Condensed',sans-serif;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+
+/* NAV */
+#main-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:8px;height:56px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--accent);letter-spacing:2px;margin-right:auto;}
+.nav-btn{background:none;border:none;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:600;letter-spacing:1px;padding:8px 14px;border-radius:8px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.nav-btn:hover,.nav-btn.active{color:var(--text);background:var(--border);}
+.nav-btn.active{color:var(--accent);}
+.nav-coins{background:var(--border);border-radius:8px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--gold);}
+.nav-level{background:var(--accent);border-radius:8px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;font-size:0.85rem;}
+
+/* LANDING */
+#landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;background:radial-gradient(ellipse at center,#0f2040 0%,var(--bg) 70%);position:relative;overflow:hidden;}
+.landing-bg-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;animation:float 8s ease-in-out infinite;}
+.orb1{width:500px;height:500px;background:var(--accent);top:-100px;left:-100px;}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-100px;right:-100px;animation-delay:-4s;}
+.landing-title{font-family:'Bebas Neue',cursive;font-size:clamp(4rem,12vw,9rem);color:#fff;line-height:.9;position:relative;}
+.landing-title span{color:var(--accent);}
+.landing-sub{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;color:var(--text-dim);margin:16px 0 40px;letter-spacing:3px;text-transform:uppercase;}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:16px 40px;font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:2px;cursor:pointer;transition:all .3s;box-shadow:0 0 40px rgba(249,115,22,.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(249,115,22,.5);}
+.btn-secondary{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;cursor:pointer;transition:all .3s;margin-left:12px;}
+.btn-secondary:hover{border-color:var(--accent2);color:var(--accent2);}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-20px);}}
+
+/* GAME CANVAS SCREEN */
+#game-screen{padding:0;}
+#game-wrapper{position:relative;background:#000;}
+canvas#gameCanvas{display:block;width:100%;max-height:calc(100vh - 56px);}
+#game-ui{position:absolute;top:0;left:0;right:0;pointer-events:none;}
+#scoreboard{background:rgba(0,0,0,.8);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);padding:8px 20px;display:flex;align-items:center;justify-content:space-between;pointer-events:auto;}
+.score-team{font-family:'Bebas Neue',cursive;font-size:2rem;display:flex;align-items:center;gap:12px;}
+.score-num{font-size:2.5rem;color:var(--accent);}
+.score-mid{text-align:center;}
+.score-timer{font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--gold);}
+.score-quarter{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text-dim);letter-spacing:2px;}
+#game-controls{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);padding:12px 20px;display:flex;gap:12px;pointer-events:auto;flex-wrap:wrap;justify-content:center;}
+.ctrl-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:10px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.ctrl-btn:hover{background:rgba(255,255,255,.2);}
+.ctrl-btn.shoot-btn{background:var(--accent);border-color:var(--accent);}
+.ctrl-btn.pass-btn{background:var(--accent2);border-color:var(--accent2);}
+#power-bar-wrap{position:absolute;left:50%;transform:translateX(-50%);bottom:70px;width:200px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);border-radius:4px;height:10px;display:none;}
+#power-bar{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);border-radius:4px;transition:width .05s;}
+#shot-indicator{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',cursive;font-size:2.5rem;opacity:0;pointer-events:none;transition:opacity .5s;}
+
+/* COLLECTION SCREEN */
+#collection-screen{padding:20px;}
+.page-title{font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--text);margin-bottom:20px;letter-spacing:2px;}
+.page-title span{color:var(--accent);}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);border-radius:8px;padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.filter-btn.active,.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;}
+
+/* PLAYER CARD */
+.player-card{border-radius:16px;padding:12px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;}
+.player-card::before{content:'';position:absolute;inset:0;border-radius:16px;opacity:.15;}
+.player-card:hover{transform:translateY(-4px) scale(1.02);}
+.card-variant-label{position:absolute;top:8px;left:8px;font-family:'Bebas Neue',cursive;font-size:.8rem;letter-spacing:2px;padding:3px 8px;border-radius:4px;z-index:2;}
+.card-ovr{position:absolute;top:8px;right:8px;font-family:'Bebas Neue',cursive;font-size:1.4rem;z-index:2;}
+.card-avatar{font-size:3.5rem;margin-bottom:4px;position:relative;z-index:1;}
+.card-name{font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;position:relative;z-index:1;line-height:1.1;}
+.card-pos{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;opacity:.7;position:relative;z-index:1;margin-top:2px;}
+.card-stats{display:flex;gap:8px;margin-top:6px;position:relative;z-index:1;}
+.stat-mini{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;text-align:center;}
+.stat-mini-val{font-weight:700;font-size:.85rem;}
+
+/* Rarity styles */
+.card-base{background:linear-gradient(135deg,#1e293b,#334155);border:1px solid var(--r-base);}
+.card-base .card-variant-label{background:var(--r-base);color:#fff;}
+.card-rookie{background:linear-gradient(135deg,#052e16,#14532d);border:1px solid var(--r-rookie);}
+.card-rookie .card-variant-label{background:var(--r-rookie);color:#fff;}
+.card-elite{background:linear-gradient(135deg,#1e3a5f,#1d4ed8);border:1px solid var(--r-elite);}
+.card-elite .card-variant-label{background:var(--r-elite);color:#fff;}
+.card-allstar{background:linear-gradient(135deg,#3b0764,#7c3aed);border:1px solid var(--r-allstar);}
+.card-allstar .card-variant-label{background:var(--r-allstar);color:#fff;}
+.card-prime{background:linear-gradient(135deg,#451a03,#b45309);border:2px solid var(--r-prime);box-shadow:0 0 20px rgba(245,158,11,.3);}
+.card-prime .card-variant-label{background:var(--r-prime);color:#000;}
+.card-legend{background:linear-gradient(135deg,#431407,#c2410c);border:2px solid var(--r-legend);box-shadow:0 0 30px rgba(249,115,22,.4);}
+.card-legend .card-variant-label{background:var(--r-legend);color:#fff;}
+.card-icon{background:linear-gradient(135deg,#500724,#be185d);border:2px solid var(--r-icon);box-shadow:0 0 40px rgba(236,72,153,.5),0 0 80px rgba(236,72,153,.2);}
+.card-icon .card-variant-label{background:var(--r-icon);color:#fff;}
+.card-icon::after{content:'';position:absolute;inset:-50%;background:conic-gradient(transparent 0deg,rgba(236,72,153,.1) 60deg,transparent 120deg);animation:iconSpin 4s linear infinite;}
+@keyframes iconSpin{to{transform:rotate(360deg);}}
+
+/* MARKET */
+#market-screen{padding:20px;}
+.market-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.market-timer{font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--accent);font-size:.9rem;background:var(--surface);border:1px solid var(--border);padding:6px 14px;border-radius:8px;}
+.market-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;}
+.market-card-wrap{position:relative;}
+.market-price{background:var(--surface);border:1px solid var(--border);border-radius:0 0 16px 16px;padding:10px;text-align:center;margin-top:-8px;}
+.market-price-num{font-family:'Bebas Neue',cursive;font-size:1.3rem;color:var(--gold);}
+.market-price-label{font-size:.7rem;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
+.btn-buy{background:var(--green);border:none;border-radius:8px;color:#fff;padding:6px 20px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;width:100%;margin-top:8px;transition:all .2s;}
+.btn-buy:hover{filter:brightness(1.1);}
+.btn-buy:disabled{background:var(--text-dim);cursor:not-allowed;}
+.sell-section{margin-top:40px;}
+.sell-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+.sell-card-wrap{position:relative;}
+.btn-sell{background:var(--red);border:none;border-radius:8px;color:#fff;padding:5px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;width:100%;margin-top:6px;font-size:.85rem;transition:all .2s;}
+.btn-sell:hover{filter:brightness(1.1);}
+
+/* TEAM BUILDER */
+#team-screen{padding:20px;}
+.team-layout{display:grid;grid-template-columns:1fr 2fr;gap:20px;}
+.team-court{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;min-height:400px;}
+.team-court-title{font-family:'Bebas Neue',cursive;font-size:1.4rem;letter-spacing:2px;margin-bottom:16px;color:var(--accent);}
+.team-slots{display:flex;flex-direction:column;gap:10px;}
+.team-slot{background:var(--surface2);border:1px dashed var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
+.team-slot:hover{border-color:var(--accent);}
+.slot-pos{font-family:'Bebas Neue',cursive;font-size:1.1rem;color:var(--accent);width:30px;}
+.slot-info{flex:1;}
+.slot-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;}
+.slot-ovr{font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--gold);}
+.roster-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;max-height:600px;overflow-y:auto;}
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+
+/* QUESTS */
+#quests-screen{padding:20px;}
+.quests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.quest-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .2s;}
+.quest-card:hover{border-color:var(--accent2);}
+.quest-type{font-family:'Bebas Neue',cursive;font-size:.75rem;letter-spacing:2px;color:var(--accent2);margin-bottom:4px;}
+.quest-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;}
+.quest-desc{font-size:.85rem;color:var(--text-dim);margin-bottom:12px;}
+.quest-progress-bar{background:var(--surface2);border-radius:4px;height:6px;margin-bottom:8px;overflow:hidden;}
+.quest-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;transition:width .5s;}
+.quest-footer{display:flex;align-items:center;justify-content:space-between;}
+.quest-reward{font-family:'Bebas Neue',cursive;color:var(--gold);font-size:1.1rem;}
+.quest-status{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:1px;}
+.btn-claim{background:var(--accent);border:none;border-radius:6px;color:#fff;padding:4px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;font-size:.85rem;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-dim);font-size:1.5rem;cursor:pointer;}
+.modal-title{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:2px;margin-bottom:16px;}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.stat-row:last-child{border-bottom:none;}
+.stat-label{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;color:var(--text-dim);}
+.stat-val{font-family:'Bebas Neue',cursive;font-size:1.3rem;}
+.stat-bar{flex:1;margin:0 12px;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;}
+.stat-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));}
+.btn-upgrade{background:linear-gradient(135deg,var(--accent2),var(--purple));border:none;border-radius:10px;color:#fff;padding:10px 24px;font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;cursor:pointer;width:100%;margin-top:16px;transition:all .2s;}
+.btn-upgrade:hover{filter:brightness(1.2);}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-family:'Barlow Condensed',sans-serif;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PROFILE BAR */
+.xp-bar-wrap{position:relative;background:var(--surface2);border-radius:4px;height:4px;flex:1;max-width:120px;overflow:hidden;}
+.xp-bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .5s;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .team-layout{grid-template-columns:1fr;}
+  .cards-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+}
+@media(max-width:480px){
+  .landing-title{font-size:4rem;}
+  #main-nav{padding:0 8px;}
+  .nav-btn{padding:6px 8px;font-size:.8rem;}
+}
+
+/* Game canvas */
+#gameCanvas{background:#1a6b3c;cursor:none;}
+.d-pad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:4px;}
+.d-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;-webkit-user-select:none;user-select:none;}
+.d-btn:active,.d-btn.pressed{background:rgba(255,255,255,.35);}
+.d-center{grid-column:2;grid-row:2;background:transparent;border:none;}
+
+/* Pack opening */
+.pack-container{text-align:center;padding:20px;}
+.pack-visual{width:150px;height:200px;margin:0 auto 20px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:4rem;cursor:pointer;transition:transform .3s;animation:packPulse 2s ease-in-out infinite;}
+@keyframes packPulse{0%,100%{box-shadow:0 0 20px var(--accent);}50%{box-shadow:0 0 50px var(--accent),0 0 80px var(--accent);}}
+.pack-visual:hover{transform:scale(1.05);}
+.pack-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:20px;}
+.pack-option{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s;text-align:center;}
+.pack-option:hover{border-color:var(--accent);transform:translateY(-2px);}
+.pack-option-title{font-family:'Bebas Neue',cursive;font-size:1.4rem;letter-spacing:2px;margin-bottom:6px;}
+.pack-option-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--gold);font-size:1.1rem;}
+.pack-option-desc{font-size:.8rem;color:var(--text-dim);margin-top:4px;}
+
+/* Showcase new card reveal */
+.card-reveal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .3s;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.card-reveal-inner{animation:revealPop .5s cubic-bezier(.68,-.55,.265,1.55);}
+@keyframes revealPop{from{transform:scale(.5) rotate(-10deg);opacity:0;}to{transform:scale(1) rotate(0deg);opacity:1;}}
+.reveal-close{margin-top:24px;background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:10px 32px;font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:2px;cursor:pointer;}
+
+/* Notification badge */
+.badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--red);border-radius:50%;font-size:.65rem;font-weight:700;margin-left:4px;vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<!-- LANDING SCREEN -->
+<div id="landing" class="screen active">
+  <div class="landing-bg-orb orb1"></div>
+  <div class="landing-bg-orb orb2"></div>
+  <div style="position:relative;z-index:1;padding:20px;">
+    <div class="landing-title font-display">BALL<br><span>KINGS</span></div>
+    <div class="landing-sub">Ultimate Basketball Card Game</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="startGame()">🏀 START PLAYING</button>
+      <button class="btn-secondary" onclick="startGame()">SIGN IN WITH GOOGLE</button>
+    </div>
+    <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;max-width:700px;margin-left:auto;margin-right:auto;">
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">🏀</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;">3v3 ARCADE BALL</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px;">Real controls. Real hoops.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">🃏</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;">600+ PLAYER CARDS</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px;">Legends to rookies.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">📈</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;">LIVE MARKET</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px;">Trade & collect rare cards.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">⭐</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;">7 CARD VARIANTS</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px;">Base → Icon rarity.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP (shown after login) -->
+<div id="app" class="screen" style="display:none;">
+  <!-- NAV -->
+  <nav id="main-nav">
+    <div class="nav-logo">BALL<span style="color:var(--text)">KINGS</span></div>
+    <button class="nav-btn active" onclick="showSection('home')">🏠</button>
+    <button class="nav-btn" onclick="showSection('play')">🏀 PLAY</button>
+    <button class="nav-btn" onclick="showSection('collection')">🃏 CARDS</button>
+    <button class="nav-btn" onclick="showSection('team')">👥 TEAM</button>
+    <button class="nav-btn" onclick="showSection('market')">📈 MARKET</button>
+    <button class="nav-btn" onclick="showSection('packs')">📦 PACKS</button>
+    <button class="nav-btn" onclick="showSection('quests')">⚡ QUESTS</button>
+    <div class="nav-coins" id="nav-coins">🪙 0</div>
+    <div class="nav-level" id="nav-level">LVL 1</div>
+  </nav>
+
+  <!-- HOME SECTION -->
+  <div id="section-home" style="padding:20px;">
+    <div id="home-content"></div>
+  </div>
+
+  <!-- PLAY SECTION -->
+  <div id="section-play" style="display:none;">
+    <div id="pre-game" style="padding:20px;text-align:center;">
+      <div class="page-title font-display">🏀 QUICK MATCH</div>
+      <p style="color:var(--text-dim);margin-bottom:24px;font-family:'Barlow Condensed',sans-serif;">3v3 Arcade Basketball — Use WASD/Arrow Keys + on-screen buttons</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;max-width:600px;margin:0 auto 24px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:1.2rem;margin-bottom:8px;color:var(--accent);">YOUR TEAM OVR</div>
+          <div id="team-ovr-display" style="font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--text);">--</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:1.2rem;margin-bottom:8px;color:var(--text-dim);">OPPONENT OVR</div>
+          <div id="opp-ovr-display" style="font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--red);">--</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="startMatch()" style="margin-bottom:12px;">🏀 TIPOFF!</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:var(--text-dim);margin-top:12px;">
+        Controls: WASD / Arrow Keys to move &nbsp;|&nbsp; Z / Space = Shoot &nbsp;|&nbsp; X = Pass &nbsp;|&nbsp; C = Steal/Block
+      </div>
+    </div>
+    <div id="game-screen" style="display:none;">
+      <div id="game-wrapper">
+        <div id="game-ui">
+          <div id="scoreboard">
+            <div class="score-team">
+              <span id="team-name-display" style="font-size:1rem;color:var(--text-dim);">YOUR TEAM</span>
+              <span class="score-num" id="score-home">0</span>
+            </div>
+            <div class="score-mid">
+              <div class="score-timer" id="game-timer">4:00</div>
+              <div class="score-quarter" id="game-quarter">1ST QUARTER</div>
+            </div>
+            <div class="score-team" style="flex-direction:row-reverse;">
+              <span style="font-size:1rem;color:var(--text-dim);">CPU</span>
+              <span class="score-num" id="score-away" style="color:var(--red);">0</span>
+            </div>
+          </div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="480"></canvas>
+        <div id="shot-indicator"></div>
+        <div id="power-bar-wrap"><div id="power-bar"></div></div>
+        <div id="game-controls">
+          <div class="d-pad">
+            <div></div>
+            <button class="d-btn" id="btn-up" onpointerdown="keys.ArrowUp=true" onpointerup="keys.ArrowUp=false">↑</button>
+            <div></div>
+            <button class="d-btn" id="btn-left" onpointerdown="keys.ArrowLeft=true" onpointerup="keys.ArrowLeft=false">←</button>
+            <div class="d-center"></div>
+            <button class="d-btn" id="btn-right" onpointerdown="keys.ArrowRight=true" onpointerup="keys.ArrowRight=false">→</button>
+            <div></div>
+            <button class="d-btn" id="btn-down" onpointerdown="keys.ArrowDown=true" onpointerup="keys.ArrowDown=false">↓</button>
+            <div></div>
+          </div>
+          <button class="ctrl-btn shoot-btn" id="btn-shoot" onpointerdown="startShot()" onpointerup="releaseShot()">🏀 SHOOT</button>
+          <button class="ctrl-btn pass-btn" id="btn-pass" onclick="doPass()">🤝 PASS</button>
+          <button class="ctrl-btn" id="btn-steal" onclick="doSteal()">🛡 STEAL</button>
+          <button class="ctrl-btn" style="background:var(--purple);border-color:var(--purple);" onclick="doBlock()">✋ BLOCK</button>
+          <button class="ctrl-btn" onclick="endGame()" style="background:var(--surface2);">⏹ END</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLLECTION SECTION -->
+  <div id="section-collection" style="display:none;padding:20px;">
+    <div class="page-title font-display">YOUR <span>COLLECTION</span></div>
+    <div class="filter-bar" id="collection-filters">
+      <button class="filter-btn active" onclick="filterCollection('all',this)">ALL</button>
+      <button class="filter-btn" onclick="filterCollection('base',this)">BASE</button>
+      <button class="filter-btn" onclick="filterCollection('rookie',this)">ROOKIE</button>
+      <button class="filter-btn" onclick="filterCollection('elite',this)">ELITE</button>
+      <button class="filter-btn" onclick="filterCollection('allstar',this)">ALL-STAR</button>
+      <button class="filter-btn" onclick="filterCollection('prime',this)">PRIME</button>
+      <button class="filter-btn" onclick="filterCollection('legend',this)">LEGEND</button>
+      <button class="filter-btn" onclick="filterCollection('icon',this)">ICON</button>
+    </div>
+    <div id="cards-count" style="font-family:'Barlow Condensed',sans-serif;color:var(--text-dim);margin-bottom:12px;font-size:.9rem;"></div>
+    <div class="cards-grid" id="collection-grid"></div>
+  </div>
+
+  <!-- TEAM SECTION -->
+  <div id="section-team" style="display:none;padding:20px;">
+    <div class="page-title font-display">TEAM <span>BUILDER</span></div>
+    <div class="team-layout">
+      <div class="team-court">
+        <div class="team-court-title">YOUR LINEUP</div>
+        <div class="team-slots" id="team-slots"></div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:'Barlow Condensed',sans-serif;color:var(--text-dim);">TEAM OVR</span>
+            <span id="team-ovr" style="font-family:'Bebas Neue',cursive;font-size:2rem;color:var(--gold);">--</span>
+          </div>
+        </div>
+      </div>
+      <div class="roster-panel">
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.4rem;letter-spacing:2px;margin-bottom:12px;">SELECT PLAYER</div>
+        <div id="roster-grid" class="roster-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKET SECTION -->
+  <div id="section-market" style="display:none;padding:20px;">
+    <div class="market-header">
+      <div class="page-title font-display" style="margin:0;">TRANSFER <span>MARKET</span></div>
+      <div class="market-timer" id="market-timer">Refreshes in: 5:00</div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:var(--text-dim);margin-bottom:16px;">Rarer cards appear less frequently. Icon cards may take hours or days to surface. Market refreshes every 5 minutes.</div>
+    <div class="market-cards" id="market-cards"></div>
+    <div class="sell-section">
+      <div style="font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:2px;margin-bottom:16px;color:var(--accent);">SELL YOUR CARDS</div>
+      <div class="sell-list" id="sell-list"></div>
+    </div>
+  </div>
+
+  <!-- PACKS SECTION -->
+  <div id="section-packs" style="display:none;padding:20px;">
+    <div class="page-title font-display">CARD <span>PACKS</span></div>
+    <div class="pack-options" id="pack-options"></div>
+    <div id="pack-result" style="display:none;text-align:center;margin-top:20px;">
+      <div style="font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:2px;margin-bottom:16px;color:var(--gold);">YOU GOT!</div>
+      <div id="pack-result-cards" class="cards-grid" style="max-width:600px;margin:0 auto;"></div>
+    </div>
+  </div>
+
+  <!-- QUESTS SECTION -->
+  <div id="section-quests" style="display:none;padding:20px;">
+    <div class="page-title font-display">DAILY & WEEKLY <span>QUESTS</span></div>
+    <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;color:var(--accent2);margin-bottom:12px;">DAILY QUESTS</div>
+    <div class="quests-grid" id="daily-quests"></div>
+    <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;color:var(--gold);margin-top:24px;margin-bottom:12px;">WEEKLY QUESTS</div>
+    <div class="quests-grid" id="weekly-quests"></div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" style="display:none;" onclick="closeModal(event)">
+  <div class="modal" id="modal-inner">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- CARD REVEAL -->
+<div class="card-reveal-overlay" id="card-reveal" style="display:none;">
+  <div class="card-reveal-inner" id="card-reveal-inner"></div>
+  <button class="reveal-close" onclick="closeReveal()">NICE! CONTINUE</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// DATA — PLAYERS DATABASE
+// ============================================================
+const VARIANTS = ['base','rookie','elite','allstar','prime','legend','icon'];
+const VARIANT_LABELS = {base:'BASE',rookie:'ROOKIE',elite:'ELITE',allstar:'ALL-STAR',prime:'PRIME',legend:'LEGEND',icon:'ICON'};
+const VARIANT_WEIGHTS = {base:0.40,rookie:0.25,elite:0.15,allstar:0.10,prime:0.05,legend:0.04,icon:0.01};
+const VARIANT_BONUS = {base:0,rookie:5,elite:12,allstar:20,prime:28,legend:35,icon:44};
+
+// Raw player pool — name, pos, era, baseOVR, emoji, hallOfFame
+const RAW_PLAYERS = [
+  // HALL OF FAME LEGENDS (multiple variants)
+  {id:'jordan',name:'Michael Jordan',pos:'SG',era:'90s',base:95,emoji:'🐐',hof:true},
+  {id:'lebron',name:'LeBron James',pos:'SF',era:'2010s',base:96,emoji:'👑',hof:false,active:true},
+  {id:'kobe',name:'Kobe Bryant',pos:'SG',era:'2000s',base:94,emoji:'🐍',hof:true},
+  {id:'magic',name:'Magic Johnson',pos:'PG',era:'80s',base:93,emoji:'✨',hof:true},
+  {id:'bird',name:'Larry Bird',pos:'SF',era:'80s',base:92,emoji:'🦅',hof:true},
+  {id:'kareem',name:'Kareem Abdul-Jabbar',pos:'C',era:'70s',base:93,emoji:'🗼',hof:true},
+  {id:'shaq',name:'Shaquille O\'Neal',pos:'C',era:'2000s',base:92,emoji:'🦁',hof:true},
+  {id:'duncan',name:'Tim Duncan',pos:'PF',era:'2000s',base:91,emoji:'🏗️',hof:true},
+  {id:'wilt',name:'Wilt Chamberlain',pos:'C',era:'60s',base:97,emoji:'🏔️',hof:true},
+  {id:'russell',name:'Bill Russell',pos:'C',era:'60s',base:91,emoji:'🛡️',hof:true},
+  {id:'oscar',name:'Oscar Robertson',pos:'PG',era:'60s',base:91,emoji:'🌟',hof:true},
+  {id:'elgin',name:'Elgin Baylor',pos:'SF',era:'60s',base:90,emoji:'🌊',hof:true},
+  {id:'jerry',name:'Jerry West',pos:'PG',era:'60s',base:90,emoji:'🎯',hof:true},
+  {id:'drj',name:'Julius Erving',pos:'SF',era:'70s',base:90,emoji:'✈️',hof:true},
+  {id:'hakeem',name:'Hakeem Olajuwon',pos:'C',era:'90s',base:92,emoji:'💃',hof:true},
+  {id:'pippen',name:'Scottie Pippen',pos:'SF',era:'90s',base:88,emoji:'🦋',hof:true},
+  {id:'barkley',name:'Charles Barkley',pos:'PF',era:'90s',base:88,emoji:'🐗',hof:true},
+  {id:'malone',name:'Karl Malone',pos:'PF',era:'90s',base:89,emoji:'📬',hof:true},
+  {id:'stockton',name:'John Stockton',pos:'PG',era:'90s',base:87,emoji:'📋',hof:true},
+  {id:'isiah',name:'Isiah Thomas',pos:'PG',era:'80s',base:88,emoji:'⚡',hof:true},
+  {id:'olajuwon',name:'Hakeem Olajuwon',pos:'C',era:'90s',base:91,emoji:'🌀',hof:true},
+  {id:'payton',name:'Gary Payton',pos:'PG',era:'90s',base:86,emoji:'🗣️',hof:true},
+  {id:'mourning',name:'Alonzo Mourning',pos:'C',era:'90s',base:85,emoji:'😤',hof:true},
+  {id:'ewing',name:'Patrick Ewing',pos:'C',era:'90s',base:87,emoji:'🗽',hof:true},
+  {id:'robinson',name:'David Robinson',pos:'C',era:'90s',base:89,emoji:'⚓',hof:true},
+  {id:'clyde',name:'Clyde Drexler',pos:'SG',era:'90s',base:87,emoji:'🌪️',hof:true},
+  {id:'reggie',name:'Reggie Miller',pos:'SG',era:'90s',base:85,emoji:'🎳',hof:true},
+  {id:'gervin',name:'George Gervin',pos:'SG',era:'70s',base:88,emoji:'🧊',hof:true},
+  {id:'worthy',name:'James Worthy',pos:'SF',era:'80s',base:86,emoji:'🦊',hof:true},
+  {id:'walton',name:'Bill Walton',pos:'C',era:'70s',base:85,emoji:'🌴',hof:true},
+  // MODERN STARS
+  {id:'curry',name:'Stephen Curry',pos:'PG',era:'2010s',base:95,emoji:'🌊',hof:false,active:true},
+  {id:'kd',name:'Kevin Durant',pos:'SF',era:'2010s',base:94,emoji:'🐍',hof:false,active:true},
+  {id:'giannis',name:'Giannis Antetokounmpo',pos:'PF',era:'2020s',base:95,emoji:'🦌',hof:false,active:true},
+  {id:'harden',name:'James Harden',pos:'PG',era:'2010s',base:91,emoji:'🧔',hof:false,active:true},
+  {id:'westbrook',name:'Russell Westbrook',pos:'PG',era:'2010s',base:88,emoji:'⛈️',hof:false,active:true},
+  {id:'kawhi',name:'Kawhi Leonard',pos:'SF',era:'2010s',base:92,emoji:'🤖',hof:false,active:true},
+  {id:'cp3',name:'Chris Paul',pos:'PG',era:'2010s',base:89,emoji:'🧪',hof:false,active:true},
+  {id:'ad',name:'Anthony Davis',pos:'PF',era:'2010s',base:93,emoji:'🦹',hof:false,active:true},
+  {id:'pg13',name:'Paul George',pos:'SF',era:'2010s',base:87,emoji:'🎮',hof:false,active:true},
+  {id:'dame',name:'Damian Lillard',pos:'PG',era:'2010s',base:90,emoji:'🌹',hof:false,active:true},
+  {id:'jokic',name:'Nikola Jokic',pos:'C',era:'2020s',base:96,emoji:'🃏',hof:false,active:true},
+  {id:'embiid',name:'Joel Embiid',pos:'C',era:'2020s',base:94,emoji:'🦁',hof:false,active:true},
+  {id:'doncic',name:'Luka Doncic',pos:'PG',era:'2020s',base:95,emoji:'🧙',hof:false,active:true},
+  {id:'tatum',name:'Jayson Tatum',pos:'SF',era:'2020s',base:92,emoji:'🍀',hof:false,active:true},
+  {id:'butler',name:'Jimmy Butler',pos:'SF',era:'2020s',base:89,emoji:'☕',hof:false,active:true},
+  {id:'middleton',name:'Khris Middleton',pos:'SF',era:'2020s',base:86,emoji:'🎸',hof:false,active:true},
+  {id:'beal',name:'Bradley Beal',pos:'SG',era:'2020s',base:87,emoji:'🔫',hof:false,active:true},
+  {id:'siakam',name:'Pascal Siakam',pos:'PF',era:'2020s',base:87,emoji:'🌍',hof:false,active:true},
+  {id:'lavine',name:'Zach LaVine',pos:'SG',era:'2020s',base:88,emoji:'🦅',hof:false,active:true},
+  {id:'morant',name:'Ja Morant',pos:'PG',era:'2020s',base:91,emoji:'🦘',hof:false,active:true},
+  {id:'booker',name:'Devin Booker',pos:'SG',era:'2020s',base:90,emoji:'📚',hof:false,active:true},
+  {id:'fox',name:"De'Aaron Fox",pos:'PG',era:'2020s',base:88,emoji:'🦊',hof:false,active:true},
+  {id:'randle',name:'Julius Randle',pos:'PF',era:'2020s',base:85,emoji:'🐂',hof:false,active:true},
+  {id:'brown',name:'Jaylen Brown',pos:'SG',era:'2020s',base:88,emoji:'🦅',hof:false,active:true},
+  {id:'halliburton',name:'Tyrese Haliburton',pos:'PG',era:'2020s',base:88,emoji:'⚡',hof:false,active:true},
+  {id:'edwards',name:'Anthony Edwards',pos:'SG',era:'2020s',base:91,emoji:'🔥',hof:false,active:true},
+  {id:'derozan',name:'DeMar DeRozan',pos:'SG',era:'2020s',base:87,emoji:'🌙',hof:false,active:true},
+  {id:'kyrie',name:'Kyrie Irving',pos:'PG',era:'2010s',base:90,emoji:'🕷️',hof:false,active:true},
+  {id:'cp3new',name:'Chris Paul',pos:'PG',era:'2020s',base:84,emoji:'🧪',hof:false,active:true},
+  {id:'lillard',name:'Damian Lillard',pos:'PG',era:'2020s',base:91,emoji:'🌹',hof:false,active:true},
+  {id:'sga',name:'Shai Gilgeous-Alexander',pos:'PG',era:'2020s',base:93,emoji:'🛸',hof:false,active:true},
+  {id:'brunson',name:'Jalen Brunson',pos:'PG',era:'2020s',base:88,emoji:'🎯',hof:false,active:true},
+  {id:'sabonis',name:'Domantas Sabonis',pos:'C',era:'2020s',base:86,emoji:'🇱🇹',hof:false,active:true},
+  {id:'wiseman',name:'James Wiseman',pos:'C',era:'2020s',base:76,emoji:'🏗️',hof:false,active:true},
+  {id:'maxey',name:'Tyrese Maxey',pos:'PG',era:'2020s',base:87,emoji:'⚡',hof:false,active:true},
+  {id:'herb',name:'Herb Jones',pos:'SF',era:'2020s',base:82,emoji:'🌿',hof:false,active:true},
+  {id:'banchero',name:'Paolo Banchero',pos:'PF',era:'2020s',base:86,emoji:'👑',hof:false,active:true},
+  {id:'holmgren',name:'Chet Holmgren',pos:'C',era:'2020s',base:85,emoji:'🦒',hof:false,active:true},
+  {id:'wembanyama',name:'Victor Wembanyama',pos:'C',era:'2020s',base:92,emoji:'👽',hof:false,active:true},
+  {id:'henderson',name:'Scoot Henderson',pos:'PG',era:'2020s',base:80,emoji:'🚀',hof:false,active:true},
+  {id:'miller',name:'Brandon Miller',pos:'SF',era:'2020s',base:81,emoji:'🌟',hof:false,active:true},
+  {id:'reed',name:'Taylor Hendricks',pos:'PF',era:'2020s',base:78,emoji:'🌴',hof:false,active:true},
+  {id:'iverson',name:'Allen Iverson',pos:'PG',era:'2000s',base:91,emoji:'💎',hof:true},
+  {id:'vince',name:'Vince Carter',pos:'SF',era:'2000s',base:87,emoji:'✈️',hof:true},
+  {id:'tmac',name:'Tracy McGrady',pos:'SF',era:'2000s',base:89,emoji:'😤',hof:true},
+  {id:'dirk',name:'Dirk Nowitzki',pos:'PF',era:'2000s',base:92,emoji:'🦩',hof:true},
+  {id:'nash',name:'Steve Nash',pos:'PG',era:'2000s',base:90,emoji:'⚽',hof:true},
+  {id:'ray',name:'Ray Allen',pos:'SG',era:'2000s',base:87,emoji:'🎯',hof:true},
+  {id:'kidd',name:'Jason Kidd',pos:'PG',era:'2000s',base:88,emoji:'🎪',hof:true},
+  {id:'garnett',name:'Kevin Garnett',pos:'PF',era:'2000s',base:91,emoji:'🐺',hof:true},
+  {id:'pierce',name:'Paul Pierce',pos:'SF',era:'2000s',base:87,emoji:'💯',hof:true},
+  {id:'wade',name:'Dwyane Wade',pos:'SG',era:'2000s',base:91,emoji:'🌊',hof:true},
+  {id:'bosh',name:'Chris Bosh',pos:'PF',era:'2010s',base:87,emoji:'🦕',hof:true},
+  {id:'melo',name:'Carmelo Anthony',pos:'SF',era:'2000s',base:89,emoji:'🏅',hof:false},
+  {id:'rondo',name:'Rajon Rondo',pos:'PG',era:'2010s',base:84,emoji:'🎩',hof:false},
+  // More diverse players
+  {id:'marbury',name:'Stephon Marbury',pos:'PG',era:'2000s',base:83,emoji:'⭐',hof:false},
+  {id:'houston',name:'Allan Houston',pos:'SG',era:'2000s',base:82,emoji:'🗽',hof:false},
+  {id:'sprewell',name:'Latrell Sprewell',pos:'SG',era:'2000s',base:82,emoji:'🌀',hof:false},
+  {id:'miller2',name:'Reggie Miller',pos:'SG',era:'90s',base:85,emoji:'🎳',hof:true},
+  {id:'artest',name:'Ron Artest',pos:'SF',era:'2000s',base:83,emoji:'🥊',hof:false},
+  {id:'odom',name:'Lamar Odom',pos:'PF',era:'2000s',base:83,emoji:'🎂',hof:false},
+  {id:'gasol',name:'Pau Gasol',pos:'C',era:'2000s',base:87,emoji:'🇪🇸',hof:true},
+  {id:'bynum',name:'Andrew Bynum',pos:'C',era:'2010s',base:80,emoji:'🐘',hof:false},
+  {id:'randolph',name:"Zach Randolph",pos:'PF',era:'2010s',base:84,emoji:'🐻',hof:false},
+  {id:'conley',name:'Mike Conley',pos:'PG',era:'2010s',base:83,emoji:'🦊',hof:false},
+  {id:'gay',name:'Rudy Gay',pos:'SF',era:'2010s',base:82,emoji:'💎',hof:false},
+  {id:'love',name:'Kevin Love',pos:'PF',era:'2010s',base:86,emoji:'❤️',hof:false},
+  {id:'thompson',name:'Klay Thompson',pos:'SG',era:'2010s',base:88,emoji:'🔥',hof:false,active:true},
+  {id:'green',name:'Draymond Green',pos:'PF',era:'2010s',base:85,emoji:'💪',hof:false,active:true},
+  {id:'drummond',name:'Andre Drummond',pos:'C',era:'2010s',base:83,emoji:'🥁',hof:false},
+  {id:'deandre',name:"DeAndre Jordan",pos:'C',era:'2010s',base:81,emoji:'🏠',hof:false},
+  {id:'whiteside',name:'Hassan Whiteside',pos:'C',era:'2010s',base:80,emoji:'🧱',hof:false},
+  {id:'gobert',name:'Rudy Gobert',pos:'C',era:'2010s',base:87,emoji:'🗼',hof:false,active:true},
+  {id:'favors',name:'Derrick Favors',pos:'PF',era:'2010s',base:79,emoji:'🔧',hof:false},
+  {id:'aldridge',name:"LaMarcus Aldridge",pos:'PF',era:'2010s',base:87,emoji:'🌧️',hof:false},
+  {id:'nene',name:'Nene',pos:'C',era:'2010s',base:78,emoji:'🇧🇷',hof:false},
+  {id:'george2',name:'Paul George',pos:'SF',era:'2020s',base:86,emoji:'🎮',hof:false,active:true},
+  {id:'oladipo',name:'Victor Oladipo',pos:'SG',era:'2010s',base:83,emoji:'🎤',hof:false},
+  {id:'sabonis2',name:'Arvydas Sabonis',pos:'C',era:'90s',base:86,emoji:'🇱🇹',hof:true},
+  {id:'petrovic',name:'Drazen Petrovic',pos:'SG',era:'90s',base:84,emoji:'🇭🇷',hof:true},
+  {id:'divac',name:'Vlade Divac',pos:'C',era:'90s',base:83,emoji:'🇷🇸',hof:true},
+  {id:'nowitzki2',name:'Dirk Nowitzki',pos:'PF',era:'2010s',base:90,emoji:'🦩',hof:true},
+  {id:'peja',name:'Peja Stojakovic',pos:'SF',era:'2000s',base:84,emoji:'🎯',hof:true},
+  {id:'webb',name:'Spud Webb',pos:'PG',era:'80s',base:78,emoji:'🤸',hof:false},
+  {id:'nance',name:'Larry Nance',pos:'SF',era:'80s',base:80,emoji:'🦅',hof:false},
+  {id:'mchale',name:'Kevin McHale',pos:'PF',era:'80s',base:88,emoji:'🏛️',hof:true},
+  {id:'parish',name:'Robert Parish',pos:'C',era:'80s',base:86,emoji:'⛪',hof:true},
+  {id:'wilkins',name:'Dominique Wilkins',pos:'SF',era:'80s',base:89,emoji:'🦁',hof:true},
+  {id:'nique2',name:'Dominique Wilkins',pos:'SF',era:'90s',base:86,emoji:'🦁',hof:true},
+  {id:'maravich',name:'Pete Maravich',pos:'PG',era:'70s',base:90,emoji:'🎪',hof:true},
+  {id:'havlicek',name:'John Havlicek',pos:'SF',era:'60s',base:88,emoji:'🏃',hof:true},
+  {id:'frazier',name:'Walt Frazier',pos:'PG',era:'70s',base:87,emoji:'🎩',hof:true},
+  {id:'cowens',name:'Dave Cowens',pos:'C',era:'70s',base:83,emoji:'🔴',hof:true},
+  {id:'petit',name:'Bob Pettit',pos:'PF',era:'50s',base:87,emoji:'🏆',hof:true},
+  {id:'greer',name:'Hal Greer',pos:'SG',era:'60s',base:82,emoji:'🌟',hof:true},
+  {id:'jones',name:'Sam Jones',pos:'SG',era:'60s',base:83,emoji:'⛹️',hof:true},
+  // 2023-24 rookies and young players
+  {id:'wemby2024',name:'Victor Wembanyama',pos:'C',era:'2020s',base:90,emoji:'👽',hof:false,active:true},
+  {id:'reed2024',name:'Cason Wallace',pos:'PG',era:'2020s',base:75,emoji:'🌊',hof:false,active:true},
+  {id:'whitmore',name:'Cam Whitmore',pos:'SF',era:'2020s',base:76,emoji:'💨',hof:false,active:true},
+  {id:'sensabaugh',name:'GG Jackson',pos:'PF',era:'2020s',base:77,emoji:'⚡',hof:false,active:true},
+  {id:'keyonte',name:'Keyonte George',pos:'PG',era:'2020s',base:76,emoji:'🎯',hof:false,active:true},
+  {id:'kobe2024',name:'Kobe Bufkin',pos:'PG',era:'2020s',base:74,emoji:'🦅',hof:false,active:true},
+  {id:'gradey',name:'Gradey Dick',pos:'SG',era:'2020s',base:74,emoji:'🎸',hof:false,active:true},
+  {id:'jarace',name:'Jarace Walker',pos:'PF',era:'2020s',base:75,emoji:'🌀',hof:false,active:true},
+  {id:'ausar',name:'Ausar Thompson',pos:'SF',era:'2020s',base:78,emoji:'🌪️',hof:false,active:true},
+  {id:'amen',name:'Amen Thompson',pos:'SF',era:'2020s',base:78,emoji:'🌊',hof:false,active:true},
+];
+
+// Generate full card database
+const ALL_PLAYERS_DB = [];
+RAW_PLAYERS.forEach(p => {
+  const variantsForPlayer = p.hof
+    ? ['base','rookie','elite','allstar','prime','legend','icon']
+    : p.active
+    ? ['base','rookie','elite','allstar','prime']
+    : ['base','rookie','elite','allstar'];
+  variantsForPlayer.forEach(v => {
+    const bonus = VARIANT_BONUS[v];
+    const rawOVR = Math.min(100, p.base + bonus);
+    const clamped = Math.max(30, Math.min(100, rawOVR));
+    const stats = generateStats(p.pos, clamped);
+    ALL_PLAYERS_DB.push({
+      id: `${p.id}_${v}`,
+      playerId: p.id,
+      name: p.name,
+      pos: p.pos,
+      era: p.era,
+      emoji: p.emoji,
+      variant: v,
+      ovr: clamped,
+      stats,
+      hof: p.hof,
+      active: !!p.active,
+      price: calcPrice(v, clamped)
+    });
+  });
+});
+
+function generateStats(pos, ovr) {
+  const base = ovr;
+  const vary = (min,max) => Math.max(30, Math.min(100, Math.round(base + (Math.random()*(max-min)+min))));
+  const posBonus = {
+    PG: {spd:8,ball:10,pass:8,three:5,mid:3,dunk:-5,def:0,reb:-8,str:-5,iq:6},
+    SG: {spd:5,ball:5,pass:3,three:8,mid:8,dunk:3,def:3,reb:-5,str:0,iq:3},
+    SF: {spd:2,ball:2,pass:0,three:3,mid:5,dunk:5,def:5,reb:3,str:5,iq:2},
+    PF: {spd:-5,ball:-3,pass:-3,three:-3,mid:3,dunk:5,def:5,reb:10,str:8,iq:2},
+    C:  {spd:-10,ball:-8,pass:-8,three:-15,mid:-5,dunk:8,def:8,reb:15,str:12,iq:0},
+  };
+  const b = posBonus[pos] || posBonus['SF'];
+  return {
+    speed:    Math.max(30,Math.min(100,Math.round(base + b.spd + rand(-8,8)))),
+    ball:     Math.max(30,Math.min(100,Math.round(base + b.ball + rand(-8,8)))),
+    passing:  Math.max(30,Math.min(100,Math.round(base + b.pass + rand(-8,8)))),
+    three:    Math.max(30,Math.min(100,Math.round(base + b.three + rand(-10,10)))),
+    midrange: Math.max(30,Math.min(100,Math.round(base + b.mid + rand(-8,8)))),
+    dunk:     Math.max(30,Math.min(100,Math.round(base + b.dunk + rand(-8,8)))),
+    defense:  Math.max(30,Math.min(100,Math.round(base + b.def + rand(-8,8)))),
+    rebound:  Math.max(30,Math.min(100,Math.round(base + b.reb + rand(-8,8)))),
+    strength: Math.max(30,Math.min(100,Math.round(base + b.str + rand(-8,8)))),
+    iq:       Math.max(30,Math.min(100,Math.round(base + b.iq + rand(-8,8)))),
+  };
+}
+
+function rand(min,max){return Math.round(Math.random()*(max-min)+min);}
+
+function calcPrice(variant, ovr) {
+  const base = {base:200,rookie:500,elite:1200,allstar:3000,prime:8000,legend:25000,icon:100000};
+  const b = base[variant] || 200;
+  return Math.round(b * (0.8 + ovr/100));
+}
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let state = {
+  coins: 5000,
+  xp: 0,
+  level: 1,
+  collection: [], // array of card IDs owned
+  team: [null,null,null,null,null], // 5 slots
+  marketCards: [],
+  marketRefreshIn: 300,
+  quests: [],
+  stats: {wins:0,losses:0,points:0,matches:0,steals:0,blocks:0},
+  lastLogin: Date.now(),
+  selectedSlot: null,
+};
+
+function saveState() {
+  try { localStorage.setItem('ballkingsState', JSON.stringify(state)); } catch(e){}
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('ballkingsState');
+    if(s) { state = {...state, ...JSON.parse(s)}; }
+  } catch(e){}
+}
+
+// ============================================================
+// STARTER TEAM
+// ============================================================
+function initStarterCollection() {
+  if(state.collection.length === 0) {
+    // Give 8 base cards
+    const starters = ['jordan_base','lebron_base','curry_base','kobe_base','shaq_base','giannis_base','doncic_base','jokic_base'];
+    starters.forEach(id => {
+      if(!state.collection.includes(id)) state.collection.push(id);
+    });
+    // Set default team
+    state.team[0] = 'curry_base';
+    state.team[1] = 'jordan_base';
+    state.team[2] = 'lebron_base';
+    state.team[3] = 'giannis_base';
+    state.team[4] = 'shaq_base';
+    saveState();
+  }
+}
+
+// ============================================================
+// QUESTS
+// ============================================================
+const DAILY_QUEST_TEMPLATES = [
+  {id:'win1',title:'First Victory',desc:'Win 1 match',goal:1,type:'wins',reward:300},
+  {id:'win3',title:'Hat Trick',desc:'Win 3 matches',goal:3,type:'wins',reward:750},
+  {id:'pts50',title:'High Scorer',desc:'Score 50 total points',goal:50,type:'points',reward:400},
+  {id:'steal5',title:'Sticky Fingers',desc:'Get 5 steals',goal:5,type:'steals',reward:350},
+  {id:'block3',title:'Swat Squad',desc:'Get 3 blocks',goal:3,type:'blocks',reward:350},
+  {id:'play3',title:'Court Time',desc:'Play 3 matches',goal:3,type:'matches',reward:200},
+];
+const WEEKLY_QUEST_TEMPLATES = [
+  {id:'win10',title:'Weekly Warrior',desc:'Win 10 matches',goal:10,type:'wins',reward:3000},
+  {id:'pts300',title:'Scoring Machine',desc:'Score 300 points',goal:300,type:'points',reward:2500},
+  {id:'play20',title:'Marathon Man',desc:'Play 20 matches',goal:20,type:'matches',reward:2000},
+  {id:'steal20',title:'Master Thief',desc:'Get 20 steals',goal:20,type:'steals',reward:2500},
+];
+
+function initQuests() {
+  if(!state.quests || state.quests.length === 0) {
+    state.quests = [
+      ...DAILY_QUEST_TEMPLATES.slice(0,4).map(q=>({...q,progress:0,claimed:false,daily:true})),
+      ...WEEKLY_QUEST_TEMPLATES.map(q=>({...q,progress:0,claimed:false,daily:false}))
+    ];
+    saveState();
+  }
+}
+
+function updateQuestProgress(type, amount) {
+  state.quests.forEach(q => {
+    if(q.type === type && !q.claimed) {
+      q.progress = Math.min(q.goal, (q.progress||0) + amount);
+    }
+  });
+  saveState();
+}
+
+// ============================================================
+// MARKET
+// ============================================================
+function generateMarketCards() {
+  const count = rand(3,5);
+  const cards = [];
+  for(let i=0;i<count;i++) {
+    const roll = Math.random();
+    let variant;
+    if(roll < 0.001) variant='icon';
+    else if(roll < 0.01) variant='legend';
+    else if(roll < 0.04) variant='prime';
+    else if(roll < 0.12) variant='allstar';
+    else if(roll < 0.27) variant='elite';
+    else if(roll < 0.52) variant='rookie';
+    else variant='base';
+    const pool = ALL_PLAYERS_DB.filter(c=>c.variant===variant);
+    const card = pool[Math.floor(Math.random()*pool.length)];
+    if(card && !cards.find(c=>c.id===card.id)) cards.push(card);
+  }
+  state.marketCards = cards.map(c=>c.id);
+  saveState();
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function toast(msg, duration=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), duration);
+}
+
+function closeModal(e) {
+  if(!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').style.display='none';
+  }
+}
+
+function closeReveal() {
+  document.getElementById('card-reveal').style.display='none';
+}
+
+function showReveal(card) {
+  const el = document.getElementById('card-reveal-inner');
+  el.innerHTML = buildCardHTML(card, 'large');
+  document.getElementById('card-reveal').style.display='flex';
+}
+
+function updateNav() {
+  document.getElementById('nav-coins').textContent = '🪙 '+state.coins.toLocaleString();
+  document.getElementById('nav-level').textContent = 'LVL '+state.level;
+}
+
+function xpForLevel(lvl) { return lvl * 500; }
+
+function addXP(amount) {
+  state.xp += amount;
+  while(state.xp >= xpForLevel(state.level)) {
+    state.xp -= xpForLevel(state.level);
+    state.level++;
+    toast(`🎉 LEVEL UP! You're now Level ${state.level}!`, 3000);
+  }
+  updateNav();
+  saveState();
+}
+
+function getCard(id) { return ALL_PLAYERS_DB.find(c=>c.id===id); }
+
+// ============================================================
+// CARD HTML BUILDER
+// ============================================================
+function buildCardHTML(card, size='normal') {
+  if(!card) return '';
+  const v = card.variant;
+  const sz = size==='large' ? 'style="width:200px;height:280px;font-size:5rem;"' : '';
+  const keyStats = ['speed','three','dunk','defense'];
+  const statLabels = {speed:'SPD',three:'3PT',dunk:'DNK',defense:'DEF'};
+  return `<div class="player-card card-${v}" ${sz} onclick="showCardModal('${card.id}')">
+    <div class="card-variant-label">${VARIANT_LABELS[v]}</div>
+    <div class="card-ovr" style="color:${v==='prime'?'#000':'#fff'}">${card.ovr}</div>
+    <div class="card-avatar">${card.emoji}</div>
+    <div class="card-name">${card.name}</div>
+    <div class="card-pos">${card.pos} · ${card.era}</div>
+    <div class="card-stats">
+      ${keyStats.map(s=>`<div class="stat-mini"><div class="stat-mini-val">${card.stats[s]}</div><div>${statLabels[s]}</div></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function showCardModal(cardId) {
+  const card = getCard(cardId);
+  if(!card) return;
+  const owned = state.collection.includes(cardId);
+  const inTeam = state.team.includes(cardId);
+  const statNames = {speed:'Speed',ball:'Ball Handling',passing:'Passing',three:'3-Point',midrange:'Mid-Range',dunk:'Dunking',defense:'Defense',rebound:'Rebounding',strength:'Strength',iq:'Basketball IQ'};
+  document.getElementById('modal-content').innerHTML = `
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+      ${buildCardHTML(card)}
+      <div style="flex:1;min-width:200px;">
+        <div class="modal-title">${card.name}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;color:var(--text-dim);margin-bottom:16px;">${card.pos} · ${card.era} · ${VARIANT_LABELS[card.variant]}</div>
+        ${Object.entries(statNames).map(([k,label])=>`
+          <div class="stat-row">
+            <span class="stat-label">${label}</span>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${card.stats[k]}%"></div></div>
+            <span class="stat-val">${card.stats[k]}</span>
+          </div>
+        `).join('')}
+        ${owned ? `<div style="color:var(--green);font-family:'Barlow Condensed',sans-serif;font-weight:600;margin-top:12px;">✓ In Your Collection</div>` : ''}
+        ${owned && !inTeam ? `<button class="btn-upgrade" onclick="quickAddToTeam('${cardId}');closeModal();">ADD TO TEAM</button>` : ''}
+      </div>
+    </div>`;
+  document.getElementById('modal').style.display='flex';
+}
+
+function quickAddToTeam(cardId) {
+  const empty = state.team.indexOf(null);
+  if(empty>=0){ state.team[empty]=cardId; toast('✓ Added to team!'); }
+  else{ state.team[4]=cardId; toast('✓ Replaced last slot!'); }
+  saveState();
+  if(document.getElementById('section-team').style.display!=='none') renderTeam();
+}
+
+// ============================================================
+// SECTIONS
+// ============================================================
+const SECTIONS = ['home','play','collection','team','market','packs','quests'];
+
+function showSection(name) {
+  SECTIONS.forEach(s=>{
+    const el = document.getElementById(`section-${s}`);
+    if(el) el.style.display = s===name?'block':'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const renderers = {
+    home: renderHome,
+    collection: renderCollection,
+    team: renderTeam,
+    market: renderMarket,
+    packs: renderPacks,
+    quests: renderQuests,
+    play: renderPlay,
+  };
+  if(renderers[name]) renderers[name]();
+}
+
+function renderHome() {
+  const ovr = getTeamOVR();
+  document.getElementById('home-content').innerHTML = `
+    <div style="padding:20px 0;">
+      <div style="font-family:'Bebas Neue',cursive;font-size:2rem;margin-bottom:4px;">WELCOME BACK, COACH</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;color:var(--text-dim);margin-bottom:24px;">Level ${state.level} · ${state.xp}/${xpForLevel(state.level)} XP · ${state.coins.toLocaleString()} Coins</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px;max-width:700px;">
+        ${[['Matches',state.stats.matches,'🏀'],['Wins',state.stats.wins,'✅'],['Points',state.stats.points,'🔥'],['Cards',state.collection.length,'🃏']].map(([l,v,e])=>`
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:1.8rem;">${e}</div>
+            <div style="font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--accent);">${v}</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text-dim);letter-spacing:1px;">${l}</div>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <button class="btn-primary" onclick="showSection('play')">🏀 PLAY NOW</button>
+        <button class="btn-secondary" onclick="showSection('packs')">📦 OPEN PACKS</button>
+        <button class="btn-secondary" onclick="showSection('market')">📈 MARKET</button>
+      </div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;margin-bottom:12px;color:var(--gold);">YOUR BEST CARDS</div>
+      <div class="cards-grid" style="max-width:800px;">
+        ${state.collection.slice(0,6).map(id=>{const c=getCard(id);return c?buildCardHTML(c):'';}).join('')}
+      </div>
+    </div>`;
+}
+
+function renderPlay() {
+  const ovr = getTeamOVR();
+  const oppOVR = Math.max(40, Math.min(95, ovr + rand(-15,10)));
+  document.getElementById('team-ovr-display').textContent = ovr || '--';
+  document.getElementById('opp-ovr-display').textContent = oppOVR;
+}
+
+function getTeamOVR() {
+  const players = state.team.filter(Boolean).map(id=>getCard(id)).filter(Boolean);
+  if(!players.length) return 0;
+  return Math.round(players.reduce((s,c)=>s+c.ovr,0)/players.length);
+}
+
+let collectionFilter = 'all';
+function filterCollection(f, btn) {
+  collectionFilter = f;
+  document.querySelectorAll('#collection-filters .filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCollection();
+}
+
+function renderCollection() {
+  const all = state.collection.map(id=>getCard(id)).filter(Boolean);
+  const filtered = collectionFilter==='all' ? all : all.filter(c=>c.variant===collectionFilter);
+  filtered.sort((a,b)=>b.ovr-a.ovr);
+  document.getElementById('cards-count').textContent = `${filtered.length} cards ${collectionFilter!=='all'?'('+VARIANT_LABELS[collectionFilter]+')':''} · ${all.length} total`;
+  document.getElementById('collection-grid').innerHTML = filtered.map(c=>buildCardHTML(c)).join('') || '<div style="color:var(--text-dim);padding:20px;">No cards in this category yet. Open packs or check the market!</div>';
+}
+
+function renderTeam() {
+  const positions = ['PG','SG','SF','PF','C'];
+  const slots = document.getElementById('team-slots');
+  slots.innerHTML = positions.map((pos,i)=>{
+    const playerId = state.team[i];
+    const card = playerId ? getCard(playerId) : null;
+    return `<div class="team-slot" onclick="selectSlot(${i})">
+      <div class="slot-pos">${pos}</div>
+      <div style="font-size:1.5rem;">${card?card.emoji:'➕'}</div>
+      <div class="slot-info">
+        <div class="slot-name">${card?card.name:'Empty Slot'}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text-dim);">${card?VARIANT_LABELS[card.variant]:'Click to assign'}</div>
+      </div>
+      ${card?`<div class="slot-ovr">${card.ovr}</div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('team-ovr').textContent = getTeamOVR() || '--';
+
+  // Roster
+  const all = state.collection.map(id=>getCard(id)).filter(Boolean).sort((a,b)=>b.ovr-a.ovr);
+  document.getElementById('roster-grid').innerHTML = all.map(c=>`
+    <div onclick="assignToTeam('${c.id}')" style="cursor:pointer;">
+      ${buildCardHTML(c)}
+      ${state.team.includes(c.id)?`<div style="background:var(--accent);text-align:center;border-radius:0 0 8px 8px;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;padding:2px;margin-top:-8px;">IN TEAM</div>`:''}
+    </div>`).join('') || '<div style="color:var(--text-dim);padding:20px;">No cards yet!</div>';
+}
+
+function selectSlot(i) { state.selectedSlot = i; toast(`Slot ${i+1} selected — click a player to assign`); }
+
+function assignToTeam(cardId) {
+  const slot = state.selectedSlot !== null ? state.selectedSlot : state.team.indexOf(null);
+  if(slot>=0 && slot<5) {
+    state.team[slot] = cardId;
+    state.selectedSlot = null;
+    saveState();
+    renderTeam();
+    toast('✓ Player assigned!');
+  } else {
+    toast('Select a slot first!');
+  }
+}
+
+function renderMarket() {
+  const cards = state.marketCards.map(id=>getCard(id)).filter(Boolean);
+  document.getElementById('market-cards').innerHTML = cards.map(card=>`
+    <div class="market-card-wrap">
+      ${buildCardHTML(card)}
+      <div class="market-price">
+        <div class="market-price-label">PRICE</div>
+        <div class="market-price-num">🪙 ${card.price.toLocaleString()}</div>
+        <button class="btn-buy" onclick="buyCard('${card.id}')" ${state.collection.includes(card.id)?'disabled':''}>
+          ${state.collection.includes(card.id)?'OWNED':'BUY'}
+        </button>
+      </div>
+    </div>`).join('') || '<div style="color:var(--text-dim);padding:20px;">No cards currently available. Check back soon!</div>';
+
+  // Sell list
+  const sellable = state.collection.map(id=>getCard(id)).filter(Boolean).sort((a,b)=>b.ovr-a.ovr);
+  document.getElementById('sell-list').innerHTML = sellable.map(card=>`
+    <div class="sell-card-wrap">
+      ${buildCardHTML(card)}
+      <button class="btn-sell" onclick="sellCard('${card.id}')">SELL 🪙${Math.round(card.price*.6).toLocaleString()}</button>
+    </div>`).join('') || '<div style="color:var(--text-dim);">No cards to sell.</div>';
+}
+
+function buyCard(id) {
+  const card = getCard(id);
+  if(!card) return;
+  if(state.collection.includes(id)){toast('Already owned!');return;}
+  if(state.coins < card.price){toast('Not enough coins! 💸');return;}
+  state.coins -= card.price;
+  state.collection.push(id);
+  saveState();
+  updateNav();
+  renderMarket();
+  showReveal(card);
+  toast(`✓ ${card.name} added to collection!`);
+}
+
+function sellCard(id) {
+  const card = getCard(id);
+  if(!card) return;
+  const sellPrice = Math.round(card.price*0.6);
+  if(!state.collection.includes(id)){toast('You don\'t own this!');return;}
+  state.collection = state.collection.filter(c=>c!==id);
+  state.team = state.team.map(t=>t===id?null:t);
+  state.coins += sellPrice;
+  saveState();
+  updateNav();
+  renderMarket();
+  toast(`💰 Sold for ${sellPrice.toLocaleString()} coins!`);
+}
+
+const PACKS = [
+  {id:'bronze',name:'BRONZE PACK',price:500,count:3,emoji:'📦',desc:'3 cards · Base/Rookie only',colors:['#78350f','#92400e'],rarities:['base','rookie']},
+  {id:'silver',name:'SILVER PACK',price:1500,count:4,emoji:'📦',desc:'4 cards · Up to Elite',colors:['#1e3a5f','#1d4ed8'],rarities:['base','rookie','elite','allstar']},
+  {id:'gold',name:'GOLD PACK',price:5000,count:5,emoji:'📦',desc:'5 cards · Up to Prime',colors:['#451a03','#b45309'],rarities:['rookie','elite','allstar','prime']},
+  {id:'diamond',name:'💎 DIAMOND PACK',price:20000,count:5,emoji:'💎',desc:'5 cards · Guaranteed Allstar+',colors:['#1e0938','#7c3aed'],rarities:['allstar','prime','legend']},
+  {id:'legend',name:'🌟 LEGEND PACK',price:100000,count:3,emoji:'🌟',desc:'3 cards · Legend/Icon cards',colors:['#431407','#dc2626'],rarities:['prime','legend','icon']},
+];
+
+function renderPacks() {
+  document.getElementById('pack-options').innerHTML = PACKS.map(pack=>`
+    <div class="pack-option" onclick="openPack('${pack.id}')" style="background:linear-gradient(135deg,${pack.colors[0]},${pack.colors[1]});">
+      <div style="font-size:2.5rem;margin-bottom:8px;">${pack.emoji}</div>
+      <div class="pack-option-title">${pack.name}</div>
+      <div class="pack-option-price">🪙 ${pack.price.toLocaleString()}</div>
+      <div class="pack-option-desc">${pack.desc}</div>
+    </div>`).join('');
+  document.getElementById('pack-result').style.display='none';
+}
+
+function openPack(packId) {
+  const pack = PACKS.find(p=>p.id===packId);
+  if(!pack) return;
+  if(state.coins < pack.price){toast('Not enough coins! 💸');return;}
+  state.coins -= pack.price;
+  const pulled = [];
+  for(let i=0;i<pack.count;i++) {
+    const pool = ALL_PLAYERS_DB.filter(c=>pack.rarities.includes(c.variant));
+    const card = pool[Math.floor(Math.random()*pool.length)];
+    if(card) {
+      if(!state.collection.includes(card.id)) state.collection.push(card.id);
+      pulled.push(card);
+    }
+  }
+  saveState();
+  updateNav();
+  addXP(50);
+  const res = document.getElementById('pack-result');
+  res.style.display='block';
+  document.getElementById('pack-result-cards').innerHTML = pulled.map(c=>buildCardHTML(c)).join('');
+  res.scrollIntoView({behavior:'smooth'});
+  // Show best card reveal
+  const best = pulled.sort((a,b)=>b.ovr-a.ovr)[0];
+  if(best && ['prime','legend','icon'].includes(best.variant)) showReveal(best);
+  toast(`📦 Pack opened! Got ${pulled.length} cards!`);
+}
+
+function renderQuests() {
+  const daily = state.quests.filter(q=>q.daily);
+  const weekly = state.quests.filter(q=>!q.daily);
+  const renderQuest = q => {
+    const pct = Math.min(100, Math.round((q.progress||0)/q.goal*100));
+    const done = q.progress >= q.goal;
+    return `<div class="quest-card">
+      <div class="quest-type">${q.daily?'DAILY':'WEEKLY'}</div>
+      <div class="quest-title">${q.title}</div>
+      <div class="quest-desc">${q.desc}</div>
+      <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
+      <div class="quest-footer">
+        <div class="quest-reward">🪙 ${q.reward.toLocaleString()}</div>
+        <div class="quest-status" style="color:${done?(q.claimed?'var(--text-dim)':'var(--green)'):'var(--text-dim)'}">
+          ${q.claimed?'CLAIMED':done?'<button class="btn-claim" onclick="claimQuest(\''+q.id+'\')">CLAIM!</button>':`${q.progress||0}/${q.goal}`}
+        </div>
+      </div>
+    </div>`;
+  };
+  document.getElementById('daily-quests').innerHTML = daily.map(renderQuest).join('');
+  document.getElementById('weekly-quests').innerHTML = weekly.map(renderQuest).join('');
+}
+
+function claimQuest(questId) {
+  const q = state.quests.find(q=>q.id===questId);
+  if(!q || q.claimed || q.progress < q.goal) return;
+  q.claimed = true;
+  state.coins += q.reward;
+  updateNav();
+  saveState();
+  renderQuests();
+  toast(`⭐ Quest complete! +${q.reward.toLocaleString()} coins!`);
+}
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+let gameRunning = false;
+let gameInterval = null;
+let animFrame = null;
+const keys = {};
+let gameState = {};
+
+const CANVAS_W = 800, CANVAS_H = 480;
+const COURT_COLOR = '#2d7a47';
+const LINE_COLOR = 'rgba(255,255,255,0.6)';
+const BALL_COLOR = '#e8762c';
+
+function initGameState() {
+  const teamOVR = getTeamOVR();
+  const playerSpeed = 3 + teamOVR/50;
+  return {
+    scoreHome: 0,
+    scoreAway: 0,
+    quarter: 1,
+    timeLeft: 240, // seconds per quarter
+    ball: {x:400,y:240,vx:0,vy:0,holder:'player',inAir:false,z:0,vz:0},
+    player: {x:200,y:240,r:16,hasBall:true,shooting:false,shotPower:0},
+    teammates: [
+      {x:150,y:160,r:14,hasBall:false,vx:0,vy:0},
+      {x:150,y:320,r:14,hasBall:false,vx:0,vy:0},
+    ],
+    opponents: [
+      {x:550,y:200,r:15,hasBall:false,vx:0,vy:0,aggression:0.3},
+      {x:600,y:240,r:15,hasBall:false,vx:0,vy:0,aggression:0.4},
+      {x:550,y:300,r:15,hasBall:false,vx:0,vy:0,aggression:0.35},
+    ],
+    homeBasket: {x:60,y:240,r:20},
+    awayBasket: {x:740,y:240,r:20},
+    playerSpeed,
+    teamOVR,
+    oppOVR: Math.max(40, Math.min(95, teamOVR + rand(-12,8))),
+    shooting: false,
+    shotPower: 0,
+    shotActive: false,
+    paused: false,
+    lastScore: '',
+    lastScoreTimer: 0,
+  };
+}
+
+document.addEventListener('keydown', e=>{
+  keys[e.key]=true;
+  if(e.key==='z'||e.key==='Z'||e.key===' ') { e.preventDefault(); startShot(); }
+  if(e.key==='x'||e.key==='X') doPass();
+  if(e.key==='c'||e.key==='C') doSteal();
+});
+document.addEventListener('keyup', e=>{
+  keys[e.key]=false;
+  if(e.key==='z'||e.key==='Z'||e.key===' ') releaseShot();
+});
+
+function startMatch() {
+  if(state.team.filter(Boolean).length < 1) { toast('Set up your team first!'); showSection('team'); return; }
+  document.getElementById('pre-game').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  gameState = initGameState();
+  gameRunning = true;
+  document.getElementById('power-bar-wrap').style.display='none';
+  startGameLoop();
+}
+
+function startGameLoop() {
+  let lastTime = 0;
+  function loop(timestamp) {
+    if(!gameRunning) return;
+    const dt = Math.min((timestamp - lastTime)/1000, 0.05);
+    lastTime = timestamp;
+    update(dt);
+    draw();
+    animFrame = requestAnimationFrame(loop);
+  }
+  animFrame = requestAnimationFrame(loop);
+
+  // Timer
+  gameInterval = setInterval(()=>{
+    if(!gameRunning || gameState.paused) return;
+    gameState.timeLeft--;
+    updateScoreboard();
+    if(gameState.timeLeft <= 0) {
+      if(gameState.quarter < 4) {
+        gameState.quarter++;
+        gameState.timeLeft = 240;
+        gameState.ball = {x:400,y:240,vx:0,vy:0,holder:'player',inAir:false,z:0,vz:0};
+        gameState.player.x=200; gameState.player.y=240;
+      } else {
+        endGame();
+      }
+    }
+  }, 1000);
+}
+
+function update(dt) {
+  const gs = gameState;
+  if(!gs) return;
+
+  // Move player
+  let dx=0,dy=0;
+  if(keys['ArrowLeft']||keys['a']||keys['A']) dx=-1;
+  if(keys['ArrowRight']||keys['d']||keys['D']) dx=1;
+  if(keys['ArrowUp']||keys['w']||keys['W']) dy=-1;
+  if(keys['ArrowDown']||keys['s']||keys['S']) dy=1;
+  if(dx||dy){const m=Math.sqrt(dx*dx+dy*dy);dx/=m;dy/=m;}
+  gs.player.x = Math.max(20,Math.min(CANVAS_W-20, gs.player.x + dx*gs.playerSpeed*60*dt));
+  gs.player.y = Math.max(20,Math.min(CANVAS_H-20, gs.player.y + dy*gs.playerSpeed*60*dt));
+
+  // Shot power
+  if(gs.shotActive && gs.player.hasBall) {
+    gs.shotPower = Math.min(100, gs.shotPower + 150*dt);
+    document.getElementById('power-bar').style.width = gs.shotPower+'%';
+    document.getElementById('power-bar-wrap').style.display='block';
+  }
+
+  // Ball following player
+  if(gs.player.hasBall) {
+    gs.ball.x = gs.player.x;
+    gs.ball.y = gs.player.y - 12;
+  }
+
+  // Ball physics in air
+  if(gs.ball.inAir) {
+    gs.ball.x += gs.ball.vx * 60 * dt;
+    gs.ball.y += gs.ball.vy * 60 * dt;
+    gs.ball.z = Math.max(0, gs.ball.z + gs.ball.vz * 60 * dt);
+    gs.ball.vz -= 0.15 * 60 * dt;
+    if(gs.ball.z <= 0) {
+      gs.ball.inAir = false;
+      gs.ball.z = 0;
+      // Check basket
+      checkBasket();
+    }
+    // Check if ball left bounds
+    if(gs.ball.x<0||gs.ball.x>CANVAS_W||gs.ball.y<0||gs.ball.y>CANVAS_H) {
+      // Turnover
+      gs.ball.inAir=false;
+      gs.ball.x=400;gs.ball.y=240;
+      gs.ball.holder='opp';
+      gs.opponents[0].hasBall=true;
+    }
+  }
+
+  // AI teammates
+  gs.teammates.forEach((tm,i)=>{
+    const targetX = 150 + (i%2)*100;
+    const targetY = 120 + i*160;
+    const tdx = targetX - tm.x, tdy = targetY - tm.y;
+    const dist = Math.sqrt(tdx*tdx+tdy*tdy);
+    if(dist>5){tm.x+=tdx/dist*2*60*dt;tm.y+=tdy/dist*2*60*dt;}
+  });
+
+  // AI opponents
+  gs.opponents.forEach((opp,i)=>{
+    let tx, ty;
+    if(!gs.ball.inAir && gs.player.hasBall) {
+      // Chase player
+      tx = gs.player.x; ty = gs.player.y;
+    } else if(gs.ball.inAir) {
+      tx = gs.ball.x; ty = gs.ball.y;
+    } else {
+      tx = 550; ty = 200 + i*80;
+    }
+    const odx = tx-opp.x, ody = ty-opp.y;
+    const od = Math.sqrt(odx*odx+ody*ody);
+    const oppSpd = (gs.oppOVR/100)*2.5;
+    if(od>30){opp.x+=odx/od*oppSpd*opp.aggression*60*dt;opp.y+=ody/od*oppSpd*opp.aggression*60*dt;}
+
+    // Opponent steals
+    if(gs.player.hasBall && od < 35 && Math.random() < 0.003) {
+      const successChance = gs.oppOVR / (gs.teamOVR + gs.oppOVR);
+      if(Math.random() < successChance * 0.3) {
+        gs.player.hasBall = false;
+        opp.hasBall = true;
+        gs.ball.holder = 'opp';
+        showGameMessage('STOLEN!', '#ef4444');
+      }
+    }
+
+    // Opponent with ball shoots
+    if(opp.hasBall) {
+      const bx = gs.homeBasket.x, by = gs.homeBasket.y;
+      const bDist = Math.sqrt((opp.x-bx)**2+(opp.y-by)**2);
+      opp.x += (bx-opp.x)/(bDist||1)*2*60*dt;
+      opp.y += (by-opp.y)/(bDist||1)*2*60*dt;
+      if(bDist < 120 && Math.random() < 0.01) {
+        // Opp shoots
+        const accuracy = gs.oppOVR/100;
+        const hit = Math.random() < accuracy * 0.6;
+        if(hit) {
+          gs.scoreAway += bDist < 60 ? 2 : 3;
+          showGameMessage(bDist<60?'CPU SCORES! +2':'CPU 3! +3','#ef4444');
+          updateScoreboard();
+        }
+        opp.hasBall = false;
+        gs.ball.x=400;gs.ball.y=240;gs.ball.holder='player';gs.player.hasBall=true;
+      }
+    }
+  });
+
+  if(gs.lastScoreTimer>0) gs.lastScoreTimer -= dt;
+}
+
+function checkBasket() {
+  const gs = gameState;
+  const basket = gs.awayBasket;
+  const dx = gs.ball.x - basket.x, dy = gs.ball.y - basket.y;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  const shotDist = Math.sqrt((gs.ball._shootX - basket.x)**2+(gs.ball._shootY - basket.y)**2)||200;
+  const accuracy = (gs.teamOVR/100) * (gs.shotPower>=40&&gs.shotPower<=70 ? 1.3 : 0.7);
+  if(dist < 40) {
+    const made = Math.random() < Math.min(0.95, accuracy * 0.7);
+    if(made) {
+      const pts = shotDist > 250 ? 3 : 2;
+      gs.scoreHome += pts;
+      showGameMessage(pts===3?'SPLASH! 🌊 +3':'BUCKET! 🔥 +'+pts,'#f97316');
+      state.stats.points += pts;
+      updateQuestProgress('points', pts);
+    } else {
+      showGameMessage('MISSED!','#64748b');
+    }
+    gs.ball.x=400;gs.ball.y=240;gs.ball.holder='opp';
+    gs.opponents[0].hasBall=true;
+    updateScoreboard();
+  }
+}
+
+let msgTimer = null;
+function showGameMessage(msg, color) {
+  const el = document.getElementById('shot-indicator');
+  el.textContent = msg;
+  el.style.color = color;
+  el.style.opacity = '1';
+  if(msgTimer) clearTimeout(msgTimer);
+  msgTimer = setTimeout(()=>el.style.opacity='0',1200);
+}
+
+function updateScoreboard() {
+  if(!gameState) return;
+  document.getElementById('score-home').textContent = gameState.scoreHome;
+  document.getElementById('score-away').textContent = gameState.scoreAway;
+  const m = Math.floor(gameState.timeLeft/60), s = gameState.timeLeft%60;
+  document.getElementById('game-timer').textContent = `${m}:${s<10?'0':''}${s}`;
+  const quarters = ['1ST','2ND','3RD','4TH'];
+  document.getElementById('game-quarter').textContent = (quarters[gameState.quarter-1]||'OT')+' QUARTER';
+}
+
+function draw() {
+  const canvas = document.getElementById('gameCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const gs = gameState;
+  if(!gs) return;
+  const W=CANVAS_W, H=CANVAS_H;
+
+  // Court
+  ctx.fillStyle='#2d7a47';
+  ctx.fillRect(0,0,W,H);
+
+  // Court lines
+  ctx.strokeStyle='rgba(255,255,255,0.5)';
+  ctx.lineWidth=2;
+  // Outer boundary
+  ctx.strokeRect(30,20,W-60,H-40);
+  // Center line
+  ctx.beginPath();ctx.moveTo(W/2,20);ctx.lineTo(W/2,H-20);ctx.stroke();
+  // Center circle
+  ctx.beginPath();ctx.arc(W/2,H/2,60,0,Math.PI*2);ctx.stroke();
+  // Left 3pt arc
+  ctx.beginPath();ctx.arc(70,H/2,150,Math.PI*0.4,Math.PI*1.6);ctx.stroke();
+  // Right 3pt arc
+  ctx.beginPath();ctx.arc(W-70,H/2,150,Math.PI*1.4,Math.PI*2.6);ctx.stroke();
+  // Left key
+  ctx.strokeRect(30,H/2-65,120,130);
+  // Right key
+  ctx.strokeRect(W-150,H/2-65,120,130);
+
+  // Baskets
+  [gs.homeBasket, gs.awayBasket].forEach((b,i)=>{
+    ctx.fillStyle='#e8762c';
+    ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+    // Backboard
+    ctx.fillStyle='rgba(255,255,255,0.8)';
+    if(i===0){ctx.fillRect(b.x-5,b.y-30,4,60);}
+    else{ctx.fillRect(b.x+1,b.y-30,4,60);}
+  });
+
+  // Teammates
+  gs.teammates.forEach(tm=>{
+    ctx.fillStyle='#3b82f6';
+    ctx.beginPath();ctx.arc(tm.x,tm.y,tm.r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 10px Barlow Condensed';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('T',tm.x,tm.y);
+  });
+
+  // Opponents
+  gs.opponents.forEach(opp=>{
+    ctx.fillStyle='#ef4444';
+    ctx.beginPath();ctx.arc(opp.x,opp.y,opp.r,0,Math.PI*2);ctx.fill();
+    if(opp.hasBall){
+      ctx.strokeStyle='#f59e0b';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(opp.x,opp.y,opp.r+4,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.fillStyle='#fff';ctx.font='bold 10px Barlow Condensed';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('C',opp.x,opp.y);
+  });
+
+  // Player
+  ctx.fillStyle='#f97316';
+  ctx.beginPath();ctx.arc(gs.player.x,gs.player.y,gs.player.r,0,Math.PI*2);ctx.fill();
+  if(gs.player.hasBall){
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(gs.player.x,gs.player.y,gs.player.r+4,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.fillStyle='#fff';ctx.font='bold 11px Barlow Condensed';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('P',gs.player.x,gs.player.y);
+
+  // Ball
+  if(!gs.player.hasBall && !gs.opponents.some(o=>o.hasBall)) {
+    const ballSize = 10 + gs.ball.z * 0.3;
+    ctx.fillStyle=BALL_COLOR;
+    ctx.beginPath();ctx.arc(gs.ball.x,gs.ball.y,ballSize,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#c05c14';ctx.lineWidth=1.5;ctx.stroke();
+    if(gs.ball.z>0){
+      ctx.fillStyle='rgba(0,0,0,0.2)';
+      ctx.beginPath();ctx.ellipse(gs.ball.x,gs.ball.y+10,ballSize*0.8,4,0,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Shot power arc when shooting
+  if(gs.shotActive && gs.player.hasBall) {
+    const pct = gs.shotPower/100;
+    ctx.strokeStyle = pct<0.4?'#ef4444':pct<0.7?'#22c55e':'#ef4444';
+    ctx.lineWidth=4;
+    ctx.beginPath();ctx.arc(gs.player.x,gs.player.y,30,0,Math.PI*2*pct);ctx.stroke();
+  }
+
+  // Range indicator
+  if(gs.player.hasBall) {
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.arc(gs.player.x,gs.player.y,250,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function startShot() {
+  if(!gameState || !gameState.player.hasBall) return;
+  gameState.shotActive = true;
+  gameState.shotPower = 0;
+}
+
+function releaseShot() {
+  if(!gameState || !gameState.shotActive) return;
+  const gs = gameState;
+  gs.shotActive = false;
+  document.getElementById('power-bar-wrap').style.display='none';
+
+  const basket = gs.awayBasket;
+  const dx = basket.x - gs.player.x, dy = basket.y - gs.player.y;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  const power = gs.shotPower;
+  const speed = dist/40;
+
+  gs.ball._shootX = gs.player.x;
+  gs.ball._shootY = gs.player.y;
+  gs.ball.x = gs.player.x;
+  gs.ball.y = gs.player.y;
+  gs.ball.vx = dx/dist*speed;
+  gs.ball.vy = dy/dist*speed;
+  gs.ball.vz = 4 + dist/80;
+  gs.ball.z = 10;
+  gs.ball.inAir = true;
+  gs.ball.holder = null;
+  gs.player.hasBall = false;
+  gs.shotPower = power;
+}
+
+function doPass() {
+  if(!gameState || !gameState.player.hasBall) return;
+  const gs = gameState;
+  const closest = gs.teammates.reduce((best,tm)=>{
+    const d=Math.sqrt((tm.x-gs.player.x)**2+(tm.y-gs.player.y)**2);
+    return d<(best.d||9999)?{tm,d}:best;
+  },{}).tm;
+  if(closest){
+    gs.player.hasBall=false;
+    setTimeout(()=>{gs.player.hasBall=true;gs.ball.holder='player';},800);
+    showGameMessage('PASS! 🤝','#3b82f6');
+  }
+}
+
+function doSteal() {
+  if(!gameState) return;
+  const gs = gameState;
+  const oppWithBall = gs.opponents.find(o=>o.hasBall);
+  if(!oppWithBall) return;
+  const dist = Math.sqrt((gs.player.x-oppWithBall.x)**2+(gs.player.y-oppWithBall.y)**2);
+  if(dist > 60){showGameMessage('TOO FAR!','#64748b');return;}
+  const success = Math.random() < (gs.teamOVR/100)*0.5;
+  if(success){
+    oppWithBall.hasBall=false;
+    gs.player.hasBall=true;gs.ball.holder='player';
+    gs.ball.x=gs.player.x;gs.ball.y=gs.player.y;
+    showGameMessage('STEAL! 🙌','#22c55e');
+    state.stats.steals++;
+    updateQuestProgress('steals',1);
+  } else {
+    showGameMessage('MISSED!','#64748b');
+  }
+}
+
+function doBlock() {
+  if(!gameState) return;
+  const gs = gameState;
+  if(gs.ball.inAir){
+    const dist=Math.sqrt((gs.player.x-gs.ball.x)**2+(gs.player.y-gs.ball.y)**2);
+    if(dist<80){
+      const success = Math.random()<0.5;
+      if(success){
+        gs.ball.inAir=false;gs.player.hasBall=true;
+        gs.ball.x=gs.player.x;gs.ball.y=gs.player.y;
+        showGameMessage('BLOCKED! ✋','#a855f7');
+        state.stats.blocks++;
+        updateQuestProgress('blocks',1);
+      } else showGameMessage('MISSED!','#64748b');
+    } else showGameMessage('OUT OF RANGE!','#64748b');
+  }
+}
+
+function endGame() {
+  gameRunning=false;
+  if(animFrame) cancelAnimationFrame(animFrame);
+  if(gameInterval) clearInterval(gameInterval);
+  const gs = gameState;
+  if(!gs) return;
+  const won = gs.scoreHome > gs.scoreAway;
+  const coins = won ? 200 + gs.scoreHome*2 : 50 + gs.scoreHome;
+  state.coins += coins;
+  state.stats.matches++;
+  state.stats.wins += won?1:0;
+  state.stats.losses += won?0:1;
+  updateQuestProgress('matches',1);
+  if(won) updateQuestProgress('wins',1);
+  addXP(won?100:30);
+  saveState();
+  updateNav();
+
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('pre-game').style.display='block';
+
+  document.getElementById('modal-content').innerHTML=`
+    <div style="text-align:center;">
+      <div style="font-size:3rem;margin-bottom:8px;">${won?'🏆':'😤'}</div>
+      <div class="modal-title">${won?'VICTORY!':'TOUGH LOSS'}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;margin:16px 0;color:var(--accent);">${gs.scoreHome} — ${gs.scoreAway}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;color:var(--text-dim);margin-bottom:20px;">Earned: 🪙 ${coins} coins · +${won?100:30} XP</div>
+      <button class="btn-primary" onclick="closeModal();showSection('play');">PLAY AGAIN</button>
+    </div>`;
+  document.getElementById('modal').style.display='flex';
+}
+
+// ============================================================
+// MARKET TIMER
+// ============================================================
+let marketTimerInterval = null;
+function startMarketTimer() {
+  if(marketTimerInterval) clearInterval(marketTimerInterval);
+  marketTimerInterval = setInterval(()=>{
+    state.marketRefreshIn = Math.max(0, state.marketRefreshIn-1);
+    const el = document.getElementById('market-timer');
+    if(el) {
+      const m=Math.floor(state.marketRefreshIn/60),s=state.marketRefreshIn%60;
+      el.textContent = `Refreshes in: ${m}:${s<10?'0':''}${s}`;
+    }
+    if(state.marketRefreshIn<=0){
+      generateMarketCards();
+      state.marketRefreshIn=300;
+      if(document.getElementById('section-market').style.display!=='none') renderMarket();
+      toast('📈 Market refreshed!');
+    }
+    saveState();
+  },1000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function startGame() {
+  loadState();
+  initStarterCollection();
+  initQuests();
+  if(!state.marketCards || state.marketCards.length===0) generateMarketCards();
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').style.display='block';
+  updateNav();
+  showSection('home');
+  startMarketTimer();
+}
+
+// Auto-start if saved state exists
+window.addEventListener('load',()=>{
+  const saved = localStorage.getItem('ballkingsState');
+  if(saved) startGame();
+});
+</script>
+</body>
+</html>
