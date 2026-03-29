@@ -2,28 +2,7 @@
 
 A fully browser-based basketball card game with arcade gameplay, 600+ player cards, a live transfer market, and progression systems. No build step, no server — pure HTML/CSS/JS.
 
-**Live at:** `https://YOUR_USERNAME.github.io/BallKings/`
-
----
-
-## 📋 How to paste files into GitHub (no Git needed)
-
-### Step 1 — Create the workflow file
-- In your repo click **Add file → Create new file**
-- In the name box type: `.github/workflows/deploy.yml`
-- Paste the contents of `deploy.yml`
-- Click **Commit changes**
-
-### Step 2 — Create the game
-- Click **Add file → Create new file**
-- Name it `index.html`
-- Paste the contents of `index.html`
-- Click **Commit changes**
-
-### Step 3 — Enable GitHub Pages
-- Go to **Settings → Pages**
-- Set **Source** to **GitHub Actions**
-- Done! Your game deploys automatically in ~30 seconds.
+**Live at:** `https://gamingvyn.github.io/BallKings/`
 
 ---
 
@@ -54,6 +33,3 @@ A fully browser-based basketball card game with arcade gameplay, 600+ player car
 All stats strictly capped 30-100. Hall of Famers get all 7 variants.
 
 ---
-
-## 💾 Save System
-Auto-saves to localStorage — no backend needed. 100% GitHub Pages compatible.
