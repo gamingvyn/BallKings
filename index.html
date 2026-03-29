@@ -6,43 +6,43 @@
 <title>BallKings</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE — classic script tag version (no npm, no build step)
+     Works directly on GitHub Pages with plain copy-paste.
+════════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-  // ┌─────────────────────────────────────────────────────────┐
-  // │  PASTE YOUR FIREBASE CONFIG HERE                        │
-  // │  console.firebase.google.com → your project →          │
-  // │  Project Settings → Your apps → Web app → Config       │
-  // └─────────────────────────────────────────────────────────┘
+<script>
   const firebaseConfig = {
-    apiKey:            "YOUR_API_KEY",
-    authDomain:        "YOUR_PROJECT.firebaseapp.com",
-    projectId:         "YOUR_PROJECT_ID",
-    storageBucket:     "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId:             "YOUR_APP_ID"
+    apiKey:            "AIzaSyDNBobfxE0zbpJjP8Bh97Csox2nC6_A4QY",
+    authDomain:        "ballkings.firebaseapp.com",
+    projectId:         "ballkings",
+    storageBucket:     "ballkings.firebasestorage.app",
+    messagingSenderId: "468868156698",
+    appId:             "1:468868156698:web:225d5fb2f851c1b93770a3"
   };
 
-  const app      = initializeApp(firebaseConfig);
-  const auth     = getAuth(app);
-  const db       = getFirestore(app);
-  const provider = new GoogleAuthProvider();
+  // Initialise Firebase
+  firebase.initializeApp(firebaseConfig);
 
-  window._bkSignIn  = () => signInWithPopup(auth, provider);
-  window._bkSignOut = () => signOut(auth);
-  window._bkSave    = (uid, data) => setDoc(doc(db,"users",uid), data, {merge:true});
+  const auth     = firebase.auth();
+  const db       = firebase.firestore();
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  // Expose helpers used by the game
+  window._bkSignIn  = () => auth.signInWithPopup(provider);
+  window._bkSignOut = () => auth.signOut();
+  window._bkSave    = (uid, data) =>
+    db.collection("users").doc(uid).set(data, { merge: true });
   window._bkLoad    = async uid => {
-    const s = await getDoc(doc(db,"users",uid));
-    return s.exists() ? s.data() : null;
+    const snap = await db.collection("users").doc(uid).get();
+    return snap.exists ? snap.data() : null;
   };
 
-  onAuthStateChanged(auth, user => {
+  // Auth state listener — fires when user signs in or out
+  auth.onAuthStateChanged(user => {
     if (user) { window._bkUser = user; window.onUserSignedIn(user); }
     else      { window._bkUser = null; window.onUserSignedOut();    }
   });
