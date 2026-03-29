@@ -57,6 +57,7 @@
   --grn:#22c55e; --red:#ef4444; --pur:#a855f7;
   --rb:#475569; --rr:#16a34a; --re:#2563eb;
   --ra:#7c3aed; --rp:#d97706; --rl:#ea580c; --ri:#db2777;
+  --rm:#ffe066;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;background:var(--bg);color:var(--txt);
@@ -214,6 +215,25 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
   background:conic-gradient(transparent 0deg,rgba(219,39,119,.07) 60deg,transparent 120deg);
   animation:cspin 5s linear infinite;}
 @keyframes cspin{to{transform:rotate(360deg);}}
+
+/* ── MASTER rarity ── OVR 100-102, ultra-exclusive */
+.vm {
+  background:linear-gradient(160deg,#1a1200,#3a2800);
+  border:2px solid var(--rm);
+  box-shadow:0 0 24px rgba(255,224,102,.5),0 0 60px rgba(255,159,28,.25),0 0 100px rgba(255,224,102,.1);
+}
+.vm .pc-vbadge{background:linear-gradient(90deg,#ffe066,#ff9f1c);color:#000;font-weight:900;}
+.vm .pc-img   {background:linear-gradient(160deg,#2a1e00,#1a1200);}
+.vm .pc-ovr   {color:var(--rm);text-shadow:0 0 12px rgba(255,224,102,.9);}
+/* animated gold shimmer border */
+.vm::before{content:'';position:absolute;inset:-2px;z-index:0;border-radius:15px;
+  background:conic-gradient(var(--rm) 0deg,#ff9f1c 90deg,#fff7d6 180deg,#ff9f1c 270deg,var(--rm) 360deg);
+  animation:mspin 3s linear infinite;pointer-events:none;}
+.vm::after{content:'';position:absolute;inset:2px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#2a1e00,#1a1200);pointer-events:none;}
+/* make card content sit above the pseudo overlays */
+.vm .pc-vbadge,.vm .pc-ovr,.vm .pc-img,.vm .pc-foot,.vm .pc-inteam{position:relative;z-index:2;}
+@keyframes mspin{to{transform:rotate(360deg);}}
 
 /* ═══════════════════════════════ FILTER BAR */
 .fbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
@@ -475,6 +495,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
       <button class="fb" onclick="fcoll('prime',this)">PRIME</button>
       <button class="fb" onclick="fcoll('legend',this)">LEGEND</button>
       <button class="fb" onclick="fcoll('icon',this)">ICON</button>
+      <button class="fb" onclick="fcoll('master',this)" style="border-color:var(--rm);color:var(--rm);">MASTER</button>
     </div>
     <div class="cgrid" id="cgrid"></div>
   </div>
@@ -551,36 +572,38 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
 <!-- ══════════════════════════════════════════ SCRIPT -->
 <script>
 // ─── CONSTANTS ────────────────────────────────────────────────
-const VL = {base:'BASE',rookie:'ROOKIE',elite:'ELITE',allstar:'ALL-STAR',prime:'PRIME',legend:'LEGEND',icon:'ICON'};
-const VCLS = {base:'vb',rookie:'vr',elite:'ve',allstar:'va',prime:'vp',legend:'vl',icon:'vi'};
-// OVR bands per variant — enforced hard cap 30-100
+const VL   = {base:'BASE',rookie:'ROOKIE',elite:'ELITE',allstar:'ALL-STAR',prime:'PRIME',legend:'LEGEND',icon:'ICON',master:'MASTER'};
+const VCLS = {base:'vb',rookie:'vr',elite:'ve',allstar:'va',prime:'vp',legend:'vl',icon:'vi',master:'vm'};
+// OVR bands per variant
+// MASTER: 100-102 — displayed as-is (beyond normal 100 cap, reserved for GOATs only)
 const VBAND = {
-  base:   [30,52], rookie:[48,63], elite:[61,74],
-  allstar:[72,83], prime:[80,89],  legend:[87,95], icon:[96,100],
+  base:   [30, 52], rookie:[48, 63], elite:[61, 74],
+  allstar:[72, 83], prime:[80, 89],  legend:[87, 95],
+  icon:   [96,100], master:[100,102],
 };
-const VPRICE = {base:120,rookie:380,elite:1000,allstar:2600,prime:7000,legend:20000,icon:90000};
+const VPRICE = {base:120,rookie:380,elite:1000,allstar:2600,prime:7000,legend:20000,icon:90000,master:500000};
 
 // ─── PLAYER DATABASE ──────────────────────────────────────────
-// tier 1-10; tier drives where in the variant band a player sits
-// hof=true → all 7 variants; active high tier → up to legend; otherwise fewer
+// tier 1-10; hof=1 → all HOF variants; master=1 → also gets Master card
+// master flag is ONLY for the undisputed all-time GOATs (very selective)
 const RAW=[
-  {id:'jordan',   n:'Michael Jordan',          pos:'SG',era:'90s',    t:10,hof:1},
-  {id:'wilt',     n:'Wilt Chamberlain',         pos:'C', era:'60s',    t:10,hof:1},
-  {id:'lebron',   n:'LeBron James',             pos:'SF',era:'2010s',  t:10,hof:0,a:1},
-  {id:'kareem',   n:'Kareem Abdul-Jabbar',      pos:'C', era:'70s',    t:10,hof:1},
-  {id:'magic',    n:'Magic Johnson',            pos:'PG',era:'80s',    t:10,hof:1},
-  {id:'bird',     n:'Larry Bird',               pos:'SF',era:'80s',    t:10,hof:1},
-  {id:'kobe',     n:'Kobe Bryant',              pos:'SG',era:'2000s',  t:10,hof:1},
-  {id:'curry',    n:'Stephen Curry',            pos:'PG',era:'2010s',  t:10,hof:0,a:1},
+  {id:'jordan',   n:'Michael Jordan',          pos:'SG',era:'90s',    t:10,hof:1,master:1},
+  {id:'wilt',     n:'Wilt Chamberlain',         pos:'C', era:'60s',    t:10,hof:1,master:1},
+  {id:'lebron',   n:'LeBron James',             pos:'SF',era:'2010s',  t:10,hof:0,a:1,master:1},
+  {id:'kareem',   n:'Kareem Abdul-Jabbar',      pos:'C', era:'70s',    t:10,hof:1,master:1},
+  {id:'magic',    n:'Magic Johnson',            pos:'PG',era:'80s',    t:10,hof:1,master:1},
+  {id:'bird',     n:'Larry Bird',               pos:'SF',era:'80s',    t:10,hof:1,master:1},
+  {id:'kobe',     n:'Kobe Bryant',              pos:'SG',era:'2000s',  t:10,hof:1,master:1},
+  {id:'curry',    n:'Stephen Curry',            pos:'PG',era:'2010s',  t:10,hof:0,a:1,master:1},
   {id:'jokic',    n:'Nikola Jokic',             pos:'C', era:'2020s',  t:10,hof:0,a:1},
   {id:'giannis',  n:'Giannis Antetokounmpo',    pos:'PF',era:'2020s',  t:10,hof:0,a:1},
   {id:'doncic',   n:'Luka Doncic',              pos:'PG',era:'2020s',  t:9, hof:0,a:1},
   {id:'kd',       n:'Kevin Durant',             pos:'SF',era:'2010s',  t:9, hof:0,a:1},
-  {id:'hakeem',   n:'Hakeem Olajuwon',          pos:'C', era:'90s',    t:9, hof:1},
-  {id:'duncan',   n:'Tim Duncan',               pos:'PF',era:'2000s',  t:9, hof:1},
-  {id:'dirk',     n:'Dirk Nowitzki',            pos:'PF',era:'2000s',  t:9, hof:1},
-  {id:'shaq',     n:"Shaquille O'Neal",         pos:'C', era:'2000s',  t:9, hof:1},
-  {id:'russell',  n:'Bill Russell',             pos:'C', era:'60s',    t:9, hof:1},
+  {id:'hakeem',   n:'Hakeem Olajuwon',          pos:'C', era:'90s',    t:9, hof:1,master:1},
+  {id:'duncan',   n:'Tim Duncan',               pos:'PF',era:'2000s',  t:9, hof:1,master:1},
+  {id:'dirk',     n:'Dirk Nowitzki',            pos:'PF',era:'2000s',  t:9, hof:1,master:1},
+  {id:'shaq',     n:"Shaquille O'Neal",         pos:'C', era:'2000s',  t:9, hof:1,master:1},
+  {id:'russell',  n:'Bill Russell',             pos:'C', era:'60s',    t:9, hof:1,master:1},
   {id:'oscar',    n:'Oscar Robertson',          pos:'PG',era:'60s',    t:9, hof:1},
   {id:'embiid',   n:'Joel Embiid',              pos:'C', era:'2020s',  t:9, hof:0,a:1},
   {id:'sga',      n:'Shai Gilgeous-Alexander',  pos:'PG',era:'2020s',  t:8, hof:0,a:1},
@@ -684,17 +707,28 @@ const RAW=[
 ];
 
 // Variants per player
+// master=1 players get the full set including Master card
 function varFor(p){
-  if(p.hof)        return ['base','rookie','elite','allstar','prime','legend','icon'];
-  if(p.a && p.t>=8) return ['base','rookie','elite','allstar','prime','legend'];
-  if(p.a)          return ['base','rookie','elite','allstar','prime'];
-  return           ['base','rookie','elite','allstar'];
+  const base = p.hof
+    ? ['base','rookie','elite','allstar','prime','legend','icon']
+    : (p.a && p.t>=8)
+      ? ['base','rookie','elite','allstar','prime','legend']
+      : p.a
+        ? ['base','rookie','elite','allstar','prime']
+        : ['base','rookie','elite','allstar'];
+  if(p.master) base.push('master');
+  return base;
 }
 
 // Stat generation
+// master OVR can be 100-102, individual stats still cap at 100 per stat
 function rng(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function clamp(v){return Math.max(30,Math.min(100,v));}
+// For OVR display we allow 100-102 on master; individual stats cap at 100
+function clampStat(v){return Math.max(30,Math.min(100,v));}
+function clampOvr(v,isMaster){return isMaster?Math.max(100,Math.min(102,v)):Math.max(30,Math.min(100,v));}
 function buildStats(pos,ovr){
+  // Use min(ovr,100) as stat base so individual stats don't exceed 100
+  const base=Math.min(100,ovr);
   const pb={
     PG:{spd:8,ball:9,pass:8,thr:6,mid:3,dnk:-5,def:0,reb:-8,str:-4,iq:7},
     SG:{spd:5,ball:5,pass:3,thr:8,mid:7,dnk:3,def:3,reb:-5,str:0,iq:3},
@@ -703,25 +737,30 @@ function buildStats(pos,ovr){
     C: {spd:-10,ball:-8,pass:-8,thr:-16,mid:-5,dnk:8,def:8,reb:15,str:13,iq:0},
   };
   const b=pb[pos]||pb.SF;
-  const v=k=>clamp(ovr+b[k]+rng(-7,7));
+  const v=k=>clampStat(base+b[k]+rng(-7,7));
   return {speed:v('spd'),ball:v('ball'),passing:v('pass'),three:v('thr'),
           mid:v('mid'),dunk:v('dnk'),defense:v('def'),rebound:v('reb'),
           strength:v('str'),iq:v('iq')};
 }
 
-// Build card DB
+// Build card DB — each variant gets its own independently rolled stats
+// so the same player genuinely plays differently across rarities
 const DB=[];
 RAW.forEach(p=>{
   varFor(p).forEach(v=>{
     const [lo,hi]=VBAND[v];
+    const isMaster=(v==='master');
     const frac=Math.min(1,(p.t-1)/9);
-    const ovr=clamp(Math.round(lo+frac*(hi-lo)+rng(-2,2)));
+    const rawOvr=Math.round(lo+frac*(hi-lo)+rng(-2,2));
+    const ovr=clampOvr(rawOvr,isMaster);
+    // Each variant rolls its own stats independently — same player, different card = different strengths
+    const stats=buildStats(p.pos,ovr);
     DB.push({
       id:`${p.id}_${v}`, pid:p.id, name:p.n, pos:p.pos,
       era:p.era, variant:v, ovr,
-      stats:buildStats(p.pos,ovr),
-      price:Math.round(VPRICE[v]*(0.75+ovr/100)),
-      hof:!!p.hof, active:!!p.a,
+      stats,
+      price:Math.round(VPRICE[v]*(0.75+Math.min(ovr,100)/100)),
+      hof:!!p.hof, active:!!p.a, isMaster,
     });
   });
 });
@@ -924,7 +963,7 @@ function cardH(card,inTeam=false){
   if(!card)return'';
   const v=card.variant;
   const cls=VCLS[v]||'vb';
-  const ovrCol=v==='prime'?'#000':'#fff';
+  const ovrCol=v==='prime'?'#000':v==='master'?'#ffe066':'#fff';
   const src=photo(card.pid,card.name);
   const isRealPhoto=!!PHOTOS[card.pid];
   const imgInner=isRealPhoto
@@ -1110,8 +1149,15 @@ function runSim(){
 let cfilt='all';
 function fcoll(f,btn){
   cfilt=f;
-  document.querySelectorAll('#cfilt .fb').forEach(b=>b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
+  document.querySelectorAll('#cfilt .fb').forEach(b=>{
+    b.classList.remove('on');
+    // restore master button gold color when not active
+    if(b.textContent==='MASTER') b.style.cssText='border-color:var(--rm);color:var(--rm);';
+  });
+  if(btn){
+    btn.classList.add('on');
+    if(f==='master') btn.style.cssText='border-color:var(--rm);color:#000;background:var(--rm);';
+  }
   rCards();
 }
 function rCards(){
@@ -1156,7 +1202,8 @@ function genMarket(){
   const n=rng(3,5);const cards=[];
   for(let i=0;i<n;i++){
     const r=Math.random();
-    let v=r<0.004?'icon':r<0.018?'legend':r<0.055?'prime':r<0.13?'allstar':r<0.28?'elite':r<0.54?'rookie':'base';
+    // master: ~0.2% — rarer than icon, may genuinely take days to appear
+    let v=r<0.002?'master':r<0.006?'icon':r<0.020?'legend':r<0.058?'prime':r<0.13?'allstar':r<0.28?'elite':r<0.54?'rookie':'base';
     const pool=DB.filter(c=>c.variant===v);
     const c=pool[rng(0,pool.length-1)];
     if(c&&!cards.find(x=>x===c.id)) cards.push(c.id);
@@ -1218,20 +1265,21 @@ function startMktTimer(){
 
 // ─── PACKS ────────────────────────────────────────────────────
 const PACKS=[
-  {id:'bronze',nm:'BRONZE PACK', pr:300,  n:3,desc:'3 Base / Rookie cards',     pool:['base','rookie'],           bg:'linear-gradient(135deg,#1c0a00,#5a1e00)'},
-  {id:'silver',nm:'SILVER PACK', pr:1200, n:4,desc:'4 cards — up to Elite',     pool:['base','rookie','elite'],   bg:'linear-gradient(135deg,#0d1928,#1d4ed8)'},
-  {id:'gold',  nm:'GOLD PACK',   pr:4000, n:5,desc:'5 cards — up to All-Star',  pool:['rookie','elite','allstar'],bg:'linear-gradient(135deg,#3a1500,#b45309)'},
-  {id:'plat',  nm:'PLAT PACK',   pr:12000,n:5,desc:'5 cards — up to Prime',     pool:['elite','allstar','prime'], bg:'linear-gradient(135deg,#1a003a,#7c3aed)'},
-  {id:'dia',   nm:'DIAMOND PACK',pr:40000,n:5,desc:'Guaranteed Prime+',          pool:['allstar','prime','legend'],bg:'linear-gradient(135deg,#00152a,#0c4a6e)'},
-  {id:'leg',   nm:'LEGEND PACK', pr:150000,n:3,desc:'3 Legend / Icon cards',    pool:['prime','legend','icon'],   bg:'linear-gradient(135deg,#3a0010,#9f1239)'},
+  {id:'bronze',nm:'BRONZE PACK',  pr:300,    n:3,desc:'3 Base / Rookie cards',       pool:['base','rookie'],             bg:'linear-gradient(135deg,#1c0a00,#5a1e00)'},
+  {id:'silver',nm:'SILVER PACK',  pr:1200,   n:4,desc:'4 cards — up to Elite',       pool:['base','rookie','elite'],     bg:'linear-gradient(135deg,#0d1928,#1d4ed8)'},
+  {id:'gold',  nm:'GOLD PACK',    pr:4000,   n:5,desc:'5 cards — up to All-Star',    pool:['rookie','elite','allstar'],  bg:'linear-gradient(135deg,#3a1500,#b45309)'},
+  {id:'plat',  nm:'PLAT PACK',    pr:12000,  n:5,desc:'5 cards — up to Prime',       pool:['elite','allstar','prime'],   bg:'linear-gradient(135deg,#1a003a,#7c3aed)'},
+  {id:'dia',   nm:'DIAMOND PACK', pr:40000,  n:5,desc:'Guaranteed Prime+',            pool:['allstar','prime','legend'],  bg:'linear-gradient(135deg,#00152a,#0c4a6e)'},
+  {id:'leg',   nm:'LEGEND PACK',  pr:150000, n:3,desc:'3 Legend / Icon cards',       pool:['prime','legend','icon'],     bg:'linear-gradient(135deg,#3a0010,#9f1239)'},
+  {id:'mst',   nm:'MASTER PACK',  pr:750000, n:1,desc:'1 guaranteed MASTER card (GOATs only)',pool:['master'],           bg:'linear-gradient(135deg,#1a1200,#3a2800)',gold:true},
 ];
 function rPacks(){
   document.getElementById('pack-grid').innerHTML=PACKS.map(p=>`
-    <div class="pack-c" style="background:${p.bg};" onclick="openPack('${p.id}')">
-      <div style="font-size:2.4rem;margin-bottom:9px;">&#128246;</div>
-      <div class="pack-name">${p.nm}</div>
-      <div class="pack-price">Coins ${p.pr.toLocaleString()}</div>
-      <div class="pack-desc">${p.desc}</div>
+    <div class="pack-c" style="background:${p.bg};${p.gold?'border:2px solid #ffe066;box-shadow:0 0 24px rgba(255,224,102,.4);':''}" onclick="openPack('${p.id}')">
+      <div style="font-size:2.4rem;margin-bottom:9px;">${p.gold?'&#128081;':'&#128246;'}</div>
+      <div class="pack-name" style="${p.gold?'color:#ffe066;':''}">${p.nm}</div>
+      <div class="pack-price" style="${p.gold?'color:#ffe066;':''}">Coins ${p.pr.toLocaleString()}</div>
+      <div class="pack-desc" style="${p.gold?'color:rgba(255,224,102,.7);':''}">${p.desc}</div>
     </div>`).join('');
   document.getElementById('pack-res').style.display='none';
 }
@@ -1250,7 +1298,7 @@ function openPack(pid){
   document.getElementById('pack-res-cards').innerHTML=pulled.map(c=>cardH(c)).join('');
   document.getElementById('pack-res').scrollIntoView({behavior:'smooth'});
   const best=pulled.sort((a,b)=>b.ovr-a.ovr)[0];
-  if(best&&['prime','legend','icon'].includes(best.variant)) showRev(best);
+  if(best&&['prime','legend','icon','master'].includes(best.variant)) showRev(best);
   toast('Pack opened! Got '+pulled.length+' cards!');
 }
 
