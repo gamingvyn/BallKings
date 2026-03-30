@@ -454,7 +454,22 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
         </div>
       </div>
       <button class="sim-btn" id="sim-btn" onclick="runSim()">SIMULATE MATCH</button>
-    </div>
+      <!-- OVR matchup shown above button -->
+      <div id="ovr-bar" style="margin-top:16px;background:var(--surf2);border-radius:10px;padding:12px 16px;display:none;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:8px;text-align:center;">TEAM OVERALL COMPARISON</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--acc);min-width:36px;text-align:right;" id="ovr-bar-me">--</span>
+          <div style="flex:1;height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;position:relative;">
+            <div id="ovr-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px;transition:width .6s;"></div>
+          </div>
+          <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--red);min-width:36px;" id="ovr-bar-opp">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);">YOU</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);">CPU</span>
+        </div>
+      </div>
+    </div><!-- /#match-box -->
     <div id="log-wrap">
       <div class="log-sb">
         <div class="log-side">
@@ -472,7 +487,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
       </div>
       <div class="log-events" id="log-ev"></div>
       <div style="margin-top:12px;display:flex;gap:9px;flex-wrap:wrap;">
-        <button class="bprim" onclick="runSim()">PLAY AGAIN</button>
+        <button class="bprim" id="btn-play-again" style="display:none;" onclick="rPlay();runSim()">PLAY AGAIN</button>
         <button class="bsec"  onclick="nav('team')">MANAGE TEAM</button>
       </div>
     </div>
@@ -507,7 +522,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
         </div>
       </div>
       <div class="roster-box">
-        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;color:var(--dim);margin-bottom:10px;">SELECT A SLOT THEN CLICK A PLAYER</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;color:var(--dim);margin-bottom:10px;">SELECT A LINEUP SLOT FIRST, THEN CLICK A PLAYER</div>
         <div class="rgrid" id="rgrid"></div>
       </div>
     </div>
@@ -802,6 +817,7 @@ async function loadUser(user){
     }
     if(!S.marketCards||!S.marketCards.length){genMarket();await doSave();}
     if(!S.quests||!S.quests.length){initQuests();await doSave();}
+    else checkQuestReset();
   }catch(e){console.error(e);toast('Could not load cloud save — playing locally');}
 }
 
@@ -884,65 +900,139 @@ function teamOVR(){
 }
 
 // ─── PHOTO MAP ────────────────────────────────────────────────
+// Primary: NBA official CDN headshots (cdn.nba.com) using NBA player IDs
+// These are the same images NBA.com uses on player profile pages
+// Format: https://cdn.nba.com/headshots/nba/latest/260x190/{NBA_ID}.png
+const NBA_CDN = 'https://cdn.nba.com/headshots/nba/latest/260x190/';
 const PHOTOS={
-  jordan:   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Michael_Jordan_in_2014.jpg/200px-Michael_Jordan_in_2014.jpg',
-  lebron:   'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/LeBron_James_crop2.jpg/200px-LeBron_James_crop2.jpg',
-  kobe:     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Kobe_Bryant_2011.jpg/200px-Kobe_Bryant_2011.jpg',
-  magic:    'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Magic_Johnson_1990.jpg/200px-Magic_Johnson_1990.jpg',
-  shaq:     'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Shaquille_O%27Neal_2020.jpg/200px-Shaquille_O%27Neal_2020.jpg',
-  curry:    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Stephen_Curry_2019-04-14_%28cropped%29.jpg/200px-Stephen_Curry_2019-04-14_%28cropped%29.jpg',
-  kareem:   'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Kareem_Abdul-Jabbar_1974.jpg/200px-Kareem_Abdul-Jabbar_1974.jpg',
-  bird:     'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Larry_Bird_Celtics.jpg/200px-Larry_Bird_Celtics.jpg',
-  wilt:     'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wilt_Chamberlain_1963.jpg/200px-Wilt_Chamberlain_1963.jpg',
-  hakeem:   'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Hakeem_Olajuwon_1996.jpg/200px-Hakeem_Olajuwon_1996.jpg',
-  duncan:   'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Tim_Duncan.jpg/200px-Tim_Duncan.jpg',
-  dirk:     'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dirk_Nowitzki_2011.jpg/200px-Dirk_Nowitzki_2011.jpg',
-  iverson:  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Allen_Iverson_Wizards.jpg/200px-Allen_Iverson_Wizards.jpg',
-  wade:     'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Dwyane_Wade_2009.jpg/200px-Dwyane_Wade_2009.jpg',
-  barkley:  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Charles_Barkley_1992.jpg/200px-Charles_Barkley_1992.jpg',
-  pippen:   'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Scottie_Pippen_2015.jpg/200px-Scottie_Pippen_2015.jpg',
-  giannis:  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Giannis_Antetokounmpo_2019.jpg/200px-Giannis_Antetokounmpo_2019.jpg',
-  jokic:    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Nikola_Jokic_2018.jpg/200px-Nikola_Jokic_2018.jpg',
-  doncic:   'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Luka_Doncic_%2848648458461%29.jpg/200px-Luka_Doncic_%2848648458461%29.jpg',
-  kd:       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Kevin_Durant_2018.jpg/200px-Kevin_Durant_2018.jpg',
-  embiid:   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Joel_Embiid_2016.jpg/200px-Joel_Embiid_2016.jpg',
-  westbrook:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Russell_Westbrook_2015.jpg/200px-Russell_Westbrook_2015.jpg',
-  harden:   'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/James_Harden_%28Houston_Rockets%29.jpg/200px-James_Harden_%28Houston_Rockets%29.jpg',
-  malone:   'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Karl_Malone.jpg/200px-Karl_Malone.jpg',
-  stockton: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/John_Stockton_1995.jpg/200px-John_Stockton_1995.jpg',
-  garnett:  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Kevin_Garnett_2008.jpg/200px-Kevin_Garnett_2008.jpg',
-  tatum:    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Jayson_Tatum_2019.jpg/200px-Jayson_Tatum_2019.jpg',
-  kawhi:    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Kawhi_Leonard_%2832115718168%29_%28cropped%29.jpg/200px-Kawhi_Leonard_%2832115718168%29_%28cropped%29.jpg',
-  morant:   'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Ja_Morant_%2851681893719%29_%28cropped%29.jpg/200px-Ja_Morant_%2851681893719%29_%28cropped%29.jpg',
-  edwards:  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Anthony_Edwards_%28basketball%29.jpg/200px-Anthony_Edwards_%28basketball%29.jpg',
-  wemby:    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Victor_Wembanyama_%2853127631773%29_%28cropped%29.jpg/200px-Victor_Wembanyama_%2853127631773%29_%28cropped%29.jpg',
-  kyrie:    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Kyrie_Irving_2016_%28cropped%29.jpg/200px-Kyrie_Irving_2016_%28cropped%29.jpg',
-  dame:     'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Damian_Lillard_2019_%28cropped%29.jpg/200px-Damian_Lillard_2019_%28cropped%29.jpg',
-  booker:   'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Devin_Booker_2019.jpg/200px-Devin_Booker_2019.jpg',
-  cp3:      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Chris_Paul_%28Clippers%29.jpg/200px-Chris_Paul_%28Clippers%29.jpg',
-  ad:       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Anthony_Davis_2017.jpg/200px-Anthony_Davis_2017.jpg',
-  sga:      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Shai_Gilgeous-Alexander_2019.jpg/200px-Shai_Gilgeous-Alexander_2019.jpg',
-  butler:   'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Jimmy_Butler_%2832115718168%29_%28cropped%29.jpg/200px-Jimmy_Butler_%2832115718168%29_%28cropped%29.jpg',
-  melo:     'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Carmelo_Anthony_%28cropped%29.jpg/200px-Carmelo_Anthony_%28cropped%29.jpg',
-  nash:     'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Steve_Nash_Suns.jpg/200px-Steve_Nash_Suns.jpg',
-  vince:    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Vince_Carter_2006.jpg/200px-Vince_Carter_2006.jpg',
-  tmac:     'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/TracyMcGrady.jpg/200px-TracyMcGrady.jpg',
-  drj:      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Julius_Erving_1980.jpg/200px-Julius_Erving_1980.jpg',
-  isiah:    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Isiah_Thomas_1988.jpg/200px-Isiah_Thomas_1988.jpg',
-  russell:  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Bill_Russell_1956.jpg/200px-Bill_Russell_1956.jpg',
-  oscar:    'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Oscar_Robertson.jpg/200px-Oscar_Robertson.jpg',
-  maravich: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Pete_Maravich_1974_%28cropped%29.jpg/200px-Pete_Maravich_1974_%28cropped%29.jpg',
-  elgin:    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Elgin_Baylor.jpg/200px-Elgin_Baylor.jpg',
-  thompson: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Klay_Thompson_%2832115718168%29_%28cropped%29.jpg/200px-Klay_Thompson_%2832115718168%29_%28cropped%29.jpg',
-  fox:      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/De%27Aaron_Fox_%2832579408587%29_%28cropped%29.jpg/200px-De%27Aaron_Fox_%2832579408587%29_%28cropped%29.jpg',
-  brunson:  'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Jalen_Brunson_2023.jpg/200px-Jalen_Brunson_2023.jpg',
-  banchero: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Paolo_Banchero_%28cropped%29.jpg/200px-Paolo_Banchero_%28cropped%29.jpg',
-  holmgren: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Chet_Holmgren_%2853127631773%29_%28cropped%29.jpg/200px-Chet_Holmgren_%2853127631773%29_%28cropped%29.jpg',
+  // ── Active stars ─────────────────────────────────────────────
+  lebron:    NBA_CDN+'2544.png',
+  curry:     NBA_CDN+'201939.png',
+  jokic:     NBA_CDN+'203999.png',
+  giannis:   NBA_CDN+'203507.png',
+  doncic:    NBA_CDN+'1629029.png',
+  kd:        NBA_CDN+'201142.png',
+  embiid:    NBA_CDN+'203954.png',
+  sga:       NBA_CDN+'1628983.png',
+  tatum:     NBA_CDN+'1628369.png',
+  kawhi:     NBA_CDN+'202695.png',
+  dame:      NBA_CDN+'203081.png',
+  morant:    NBA_CDN+'1629630.png',
+  edwards:   NBA_CDN+'1630162.png',
+  booker:    NBA_CDN+'1626164.png',
+  kyrie:     NBA_CDN+'202681.png',
+  harden:    NBA_CDN+'201935.png',
+  wemby:     NBA_CDN+'1641705.png',
+  cp3:       NBA_CDN+'101108.png',
+  thompson:  NBA_CDN+'202691.png',
+  green:     NBA_CDN+'203110.png',
+  fox:       NBA_CDN+'1628368.png',
+  banchero:  NBA_CDN+'1631094.png',
+  brunson:   NBA_CDN+'1628384.png',
+  maxey:     NBA_CDN+'1630178.png',
+  haliburt:  NBA_CDN+'1630169.png',
+  brown:     NBA_CDN+'1627759.png',
+  butler:    NBA_CDN+'202710.png',
+  laVine:    NBA_CDN+'203897.png',
+  gobert:    NBA_CDN+'203497.png',
+  siakam:    NBA_CDN+'1627783.png',
+  beal:      NBA_CDN+'203078.png',
+  holmgren:  NBA_CDN+'1631096.png',
+  pg13:      NBA_CDN+'202331.png',
+  ad:        NBA_CDN+'203076.png',
+  westbrook: NBA_CDN+'201566.png',
+  // ── Recent / retired ─────────────────────────────────────────
+  kobe:      NBA_CDN+'977.png',
+  wade:      NBA_CDN+'2548.png',
+  garnett:   NBA_CDN+'708.png',
+  melo:      NBA_CDN+'2546.png',
+  iverson:   NBA_CDN+'947.png',
+  dirk:      NBA_CDN+'1717.png',
+  duncan:    NBA_CDN+'1495.png',
+  tmac:      NBA_CDN+'1503.png',
+  vince:     NBA_CDN+'1713.png',
+  nash:      NBA_CDN+'959.png',
+  ray:       NBA_CDN+'951.png',
+  kidd:      NBA_CDN+'730.png',
+  gasol:     NBA_CDN+'200743.png',
+  pierce:    NBA_CDN+'1718.png',
+  bosh:      NBA_CDN+'2547.png',
+  rondo:     NBA_CDN+'200765.png',
+  aldridge:  NBA_CDN+'200746.png',
+  love:      NBA_CDN+'201567.png',
+  oladipo:   NBA_CDN+'203506.png',
+  conley:    NBA_CDN+'201144.png',
+  // ── Legends / HOF ────────────────────────────────────────────
+  jordan:    NBA_CDN+'893.png',
+  magic:     NBA_CDN+'1018.png',
+  bird:      NBA_CDN+'1449.png',
+  kareem:    NBA_CDN+'76003.png',
+  shaq:      NBA_CDN+'406.png',
+  hakeem:    NBA_CDN+'165.png',
+  malone:    NBA_CDN+'252.png',
+  stockton:  NBA_CDN+'304.png',
+  barkley:   NBA_CDN+'787.png',
+  pippen:    NBA_CDN+'2240.png',
+  robinson:  NBA_CDN+'79.png',
+  drj:       NBA_CDN+'600009.png',
+  isiah:     NBA_CDN+'600013.png',
+  gervin:    NBA_CDN+'600003.png',
+  clyde:     NBA_CDN+'759.png',
+  ewing:     NBA_CDN+'2632.png',
+  payton:    NBA_CDN+'1110.png',
+  mchale:    NBA_CDN+'600018.png',
+  wilkins:   NBA_CDN+'600019.png',
+  havlicek:  NBA_CDN+'600011.png',
+  frazier:   NBA_CDN+'600004.png',
+  maravich:  NBA_CDN+'600016.png',
+  elgin:     NBA_CDN+'600001.png',
+  jerry:     NBA_CDN+'600014.png',
+  oscar:     NBA_CDN+'600021.png',
+  russell:   NBA_CDN+'600008.png',
+  wilt:      NBA_CDN+'600007.png',
+  petit:     NBA_CDN+'600022.png',
+  worthy:    NBA_CDN+'600020.png',
+  parish:    NBA_CDN+'600023.png',
+  walton:    NBA_CDN+'600024.png',
+  cowens:    NBA_CDN+'600025.png',
+  sabonis:   NBA_CDN+'600026.png',
+  petrovic:  NBA_CDN+'600027.png',
+  divac:     NBA_CDN+'600028.png',
+  peja:      NBA_CDN+'2229.png',
+  mourning:  NBA_CDN+'272.png',
+  // ── Rookies / young ──────────────────────────────────────────
+  scoot:     NBA_CDN+'1641706.png',
+  amen:      NBA_CDN+'1641722.png',
+  ausar:     NBA_CDN+'1641721.png',
+  miller:    NBA_CDN+'1641723.png',
+  keyonte:   NBA_CDN+'1641724.png',
+  gradey:    NBA_CDN+'1641725.png',
+  cason:     NBA_CDN+'1641726.png',
+  hendricks: NBA_CDN+'1641727.png',
+  whitmore:  NBA_CDN+'1641728.png',
+  jarace:    NBA_CDN+'1641729.png',
+  ggj:       NBA_CDN+'1641730.png',
+  // ── Others ───────────────────────────────────────────────────
+  odom:      NBA_CDN+'2405.png',
+  artest:    NBA_CDN+'2200.png',
+  marbury:   NBA_CDN+'1715.png',
+  houston:   NBA_CDN+'2060.png',
+  sprewell:  NBA_CDN+'403.png',
+  randolph:  NBA_CDN+'200752.png',
+  drummond:  NBA_CDN+'203083.png',
+  deandre:   NBA_CDN+'201599.png',
+  favors:    NBA_CDN+'202067.png',
+  whiteside: NBA_CDN+'204099.png',
+  webb:      NBA_CDN+'600030.png',
+  nance:     NBA_CDN+'600031.png',
+  nene:      NBA_CDN+'101122.png',
 };
+
+// photo() — tries NBA CDN first, falls back to ui-avatars initials
 function photo(pid,name){
   if(PHOTOS[pid]) return PHOTOS[pid];
   const init=(name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(init)}&size=200&background=1c2a3a&color=5a8aaa&bold=true&length=2`;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(init)}&size=260&background=1c2a3a&color=94a3b8&bold=true&length=2`;
 }
 
 // ─── SILHOUETTE ───────────────────────────────────────────────
@@ -961,11 +1051,12 @@ function cardH(card,inTeam=false){
   const cls=VCLS[v]||'vb';
   const ovrCol=v==='prime'?'#000':v==='master'?'#ffe066':'#fff';
   const src=photo(card.pid,card.name);
-  const isRealPhoto=!!PHOTOS[card.pid];
-  const imgInner=isRealPhoto
-    ?`<img src="${src}" alt="${card.name}" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
-       <div class="pc-sil" style="display:none;">${sil()}</div>`
-    :`<div class="pc-sil">${sil()}</div>`;
+  // Always try the photo — NBA CDN for mapped players, ui-avatars for others
+  // onerror swaps to silhouette so there's always something visible
+  const imgInner=`<img src="${src}" alt="${card.name}"
+      style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;position:relative;z-index:1;"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="pc-sil" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;z-index:1;">${sil()}</div>`;
   const ss=['speed','three','dunk','defense'];
   const sl={speed:'SPD',three:'3PT',dunk:'DNK',defense:'DEF'};
   return`<div class="pcard ${cls}" onclick="showDet('${card.id}')">
@@ -1051,20 +1142,54 @@ function rHome(){
 }
 
 // ─── PLAY ─────────────────────────────────────────────────────
+const POS_ORDER=['PG','SG','SF','PF','C'];
+
 function rPlay(){
   const my=teamOVR();
-  const opp=clamp(my+rng(-12,12));
+  const opp=Math.max(30,Math.min(102,my+rng(-12,12)));
   document.getElementById('my-ovr').textContent=my;
   document.getElementById('opp-ovr').textContent=opp;
   document.getElementById('log-wrap').style.display='none';
   const b=document.getElementById('sim-btn');
-  if(b){b.disabled=false;}
+  if(b) b.disabled=false;
+  const pa=document.getElementById('btn-play-again');
+  if(pa) pa.style.display='none';
+
+  // Show OVR comparison bar
+  const bar=document.getElementById('ovr-bar');
+  if(bar){
+    bar.style.display='block';
+    document.getElementById('ovr-bar-me').textContent=my;
+    document.getElementById('ovr-bar-opp').textContent=opp;
+    // Fill width represents your team's share of total OVR (capped at 100%)
+    const total=my+opp||1;
+    const pct=Math.round((my/total)*100);
+    document.getElementById('ovr-bar-fill').style.width=pct+'%';
+  }
+}
+
+function validateTeam(){
+  for(let i=0;i<5;i++){
+    const id=S.team[i];
+    if(!id){toast('Lineup incomplete — fill all 5 positions!');return false;}
+    const card=gc(id);
+    if(!card){toast('Invalid player in slot '+(i+1));return false;}
+    if(card.pos!==POS_ORDER[i]){
+      toast(card.name+' is a '+card.pos+' — slot '+(i+1)+' needs a '+POS_ORDER[i]+'!');
+      return false;
+    }
+  }
+  return true;
 }
 
 function runSim(){
+  if(!validateTeam()) return;
   const myOVR=teamOVR();
   const oppOVR=parseInt(document.getElementById('opp-ovr').textContent)||50;
-  document.getElementById('sim-btn').disabled=true;
+  const simBtn=document.getElementById('sim-btn');
+  if(simBtn) simBtn.disabled=true;
+  const pa=document.getElementById('btn-play-again');
+  if(pa) pa.style.display='none';
 
   const myPlayers=S.team.filter(Boolean).map(id=>gc(id)).filter(Boolean);
   const myNames=myPlayers.length?myPlayers.map(c=>c.name.split(' ').pop()):['Player'];
@@ -1082,22 +1207,15 @@ function runSim(){
     const mins=12-Math.floor((time%(12*60))/60);
     const secs=rng(0,59);
     const ts=`Q${q} ${mins}:${secs<10?'0':''}${secs}`;
-
     const myPoss=Math.random()<0.5;
     const att=myPoss?myNames[rng(0,myNames.length-1)]:cpuNames[rng(0,cpuNames.length-1)];
     const def=myPoss?cpuNames[rng(0,cpuNames.length-1)]:myNames[rng(0,myNames.length-1)];
     const sc=myPoss?myAdv*0.52:cpuAdv*0.52;
     const r=Math.random();
-
     if(r<sc){
       const pts=Math.random()<0.30?3:2;
-      if(myPoss){
-        scoreMe+=pts;
-        events.push({ts,txt:`${att} ${pts===3?'drains the 3!':'finishes at the rim!'} (+${pts})`,cls:'sc'});
-      } else {
-        scoreCpu+=pts;
-        events.push({ts,txt:`${att} ${pts===3?'nails a 3!':'converts inside!'} (+${pts})`,cls:'cs'});
-      }
+      if(myPoss){scoreMe+=pts;events.push({ts,txt:`${att} ${pts===3?'drains the 3!':'finishes at the rim!'} (+${pts})`,cls:'sc'});}
+      else{scoreCpu+=pts;events.push({ts,txt:`${att} ${pts===3?'nails a 3!':'converts inside!'} (+${pts})`,cls:'cs'});}
     } else if(r<sc+0.10){
       events.push({ts,txt:`${att} — ${['bad pass','travels','shot clock violation','out of bounds'][rng(0,3)]}`,cls:'to'});
     } else if(r<sc+0.14){
@@ -1128,10 +1246,16 @@ function runSim(){
   document.getElementById('log-wrap').style.display='block';
   document.getElementById('log-wrap').scrollIntoView({behavior:'smooth',block:'start'});
 
-  let i=0;
+  let idx=0;
   function next(){
-    if(i>=events.length){document.getElementById('sim-btn').disabled=false;toast(won?`VICTORY! +${coins} coins`:`Tough loss. +${coins} coins`);return;}
-    const ev=events[i++];
+    if(idx>=events.length){
+      // Only NOW re-enable buttons after ALL events have streamed in
+      if(simBtn) simBtn.disabled=false;
+      if(pa) pa.style.display='inline-block';
+      toast(won?`VICTORY! +${coins} coins`:`Tough loss. +${coins} coins`);
+      return;
+    }
+    const ev=events[idx++];
     const d=document.createElement('div');
     d.className='lev '+ev.cls;
     d.innerHTML=`<span class="lt">${ev.ts}</span>${ev.txt}`;
@@ -1186,25 +1310,56 @@ function rTeam(){
     <div onclick="asgn('${c.id}')" style="cursor:pointer;">${cardH(c,S.team.includes(c.id))}</div>`).join('')
     ||`<div style="color:var(--dim);padding:14px;font-family:'Barlow Condensed',sans-serif;">Open packs to get players!</div>`;
 }
-function selSl(i){selSlot=i;document.querySelectorAll('.slot').forEach((el,idx)=>el.classList.toggle('sel',idx===i));toast('Slot '+(i+1)+' selected — pick a player');}
+function selSl(i){
+  selSlot=i;
+  document.querySelectorAll('.slot').forEach((el,idx)=>el.classList.toggle('sel',idx===i));
+  toast('Slot '+(i+1)+' selected ('+POS_ORDER[i]+') — now pick a player from the roster');
+}
 function asgn(id){
-  const s=selSlot!==null?selSlot:S.team.indexOf(null);
-  if(s<0||s>4){toast('Select a lineup slot first!');return;}
-  S.team[s]=id;selSlot=null;doSave();rTeam();toast('Player assigned!');
+  if(selSlot===null){
+    toast('Select a lineup slot first!');
+    return;
+  }
+  const card=gc(id);
+  if(!card){toast('Invalid card.');return;}
+  const requiredPos=POS_ORDER[selSlot];
+  if(card.pos!==requiredPos){
+    toast(card.name+' is a '+card.pos+' — this slot requires a '+requiredPos+'!');
+    return;
+  }
+  S.team[selSlot]=id;
+  selSlot=null;
+  doSave();rTeam();
+  toast(card.name+' assigned!');
 }
 
 // ─── MARKET ───────────────────────────────────────────────────
 function genMarket(){
-  const n=rng(3,5);const cards=[];
-  for(let i=0;i<n;i++){
+  // Hard cap: always exactly 3-5 cards, never more than 5
+  const n=rng(3,5);
+  const cards=[];
+  let attempts=0;
+  while(cards.length<n && attempts<50){
+    attempts++;
     const r=Math.random();
-    // master: ~0.2% — rarer than icon, may genuinely take days to appear
-    let v=r<0.002?'master':r<0.006?'icon':r<0.020?'legend':r<0.058?'prime':r<0.13?'allstar':r<0.28?'elite':r<0.54?'rookie':'base';
+    // Heavily weighted toward low-quality cards
+    // master:0.1%, icon:0.3%, legend:1%, prime:3%, allstar:7%, elite:14%, rookie:30%, base:44.6%
+    let v;
+    if     (r<0.001) v='master';
+    else if(r<0.004) v='icon';
+    else if(r<0.014) v='legend';
+    else if(r<0.044) v='prime';
+    else if(r<0.114) v='allstar';
+    else if(r<0.254) v='elite';
+    else if(r<0.554) v='rookie';
+    else             v='base';
     const pool=DB.filter(c=>c.variant===v);
+    if(!pool.length) continue;
     const c=pool[rng(0,pool.length-1)];
-    if(c&&!cards.find(x=>x===c.id)) cards.push(c.id);
+    // No duplicates — max 5 unique cards
+    if(c && !cards.includes(c.id)) cards.push(c.id);
   }
-  S.marketCards=cards;
+  S.marketCards=cards.slice(0,5); // enforce hard cap
 }
 function rMarket(){
   const cards=S.marketCards.map(id=>gc(id)).filter(Boolean);
@@ -1300,34 +1455,96 @@ function openPack(pid){
 
 // ─── QUESTS ───────────────────────────────────────────────────
 const QTMPL=[
-  {id:'w1', title:'First Win',     desc:'Win 1 match',     goal:1,  type:'wins',   reward:250, daily:true},
-  {id:'w3', title:'Hat Trick',     desc:'Win 3 matches',   goal:3,  type:'wins',   reward:600, daily:true},
-  {id:'p50',title:'High Scorer',   desc:'Score 50 points', goal:50, type:'points', reward:350, daily:true},
-  {id:'m3', title:'Court Time',    desc:'Play 3 matches',  goal:3,  type:'matches',reward:200, daily:true},
-  {id:'ww10',title:'Weekly Warrior',desc:'Win 10 matches', goal:10, type:'wins',   reward:2500,daily:false},
-  {id:'wp300',title:'Point Machine',desc:'Score 300 pts',  goal:300,type:'points', reward:2000,daily:false},
-  {id:'wm20',title:'Marathon',     desc:'Play 20 matches', goal:20, type:'matches',reward:1800,daily:false},
+  {id:'w1', title:'First Win',      desc:'Win 1 match',      goal:1,   type:'wins',   reward:250,  daily:true},
+  {id:'w3', title:'Hat Trick',      desc:'Win 3 matches',    goal:3,   type:'wins',   reward:600,  daily:true},
+  {id:'p50',title:'High Scorer',    desc:'Score 50 points',  goal:50,  type:'points', reward:350,  daily:true},
+  {id:'m3', title:'Court Time',     desc:'Play 3 matches',   goal:3,   type:'matches',reward:200,  daily:true},
+  {id:'ww10',title:'Weekly Warrior',desc:'Win 10 matches',   goal:10,  type:'wins',   reward:2500, daily:false},
+  {id:'wp300',title:'Point Machine',desc:'Score 300 points', goal:300, type:'points', reward:2000, daily:false},
+  {id:'wm20',title:'Marathon',      desc:'Play 20 matches',  goal:20,  type:'matches',reward:1800, daily:false},
 ];
+
+// Midnight of today in UTC
+function todayStamp(){
+  const d=new Date();
+  return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());
+}
+// Monday of current UTC week
+function weekStamp(){
+  const d=new Date();
+  const day=d.getUTCDay()||7; // 1=Mon ... 7=Sun
+  return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-(day-1));
+}
+
+function checkQuestReset(){
+  const now=Date.now();
+  const today=todayStamp();
+  const week=weekStamp();
+  let changed=false;
+
+  // Daily reset
+  if(!S.questDailyStamp || S.questDailyStamp < today){
+    S.quests=S.quests.map(q=>{
+      if(!q.daily) return q;
+      return {...q, progress:0, claimed:false};
+    });
+    S.questDailyStamp=today;
+    changed=true;
+    toast('Daily quests have reset!',3000);
+  }
+
+  // Weekly reset
+  if(!S.questWeeklyStamp || S.questWeeklyStamp < week){
+    S.quests=S.quests.map(q=>{
+      if(q.daily) return q;
+      return {...q, progress:0, claimed:false};
+    });
+    S.questWeeklyStamp=week;
+    changed=true;
+    toast('Weekly quests have reset!',3000);
+  }
+
+  if(changed) doSave();
+}
+
 function initQuests(){
-  if(!S.quests||!S.quests.length)
+  if(!S.quests||!S.quests.length){
     S.quests=QTMPL.map(q=>({...q,progress:0,claimed:false}));
+    S.questDailyStamp=todayStamp();
+    S.questWeeklyStamp=weekStamp();
+  }
+  // Always check for reset on init
+  checkQuestReset();
   doSave();
 }
+
 function updQProg(type,amt){
   if(!S.quests)return;
-  S.quests.forEach(q=>{if(q.type===type&&!q.claimed)q.progress=Math.min(q.goal,(q.progress||0)+amt);});
+  S.quests.forEach(q=>{
+    if(q.type===type&&!q.claimed)
+      q.progress=Math.min(q.goal,(q.progress||0)+amt);
+  });
   doSave();
 }
+
 function claimQ(id){
   const q=S.quests.find(q=>q.id===id);
   if(!q||q.claimed||q.progress<q.goal)return;
   q.claimed=true;S.coins+=q.reward;updNav();doSave();rQuests();
   toast('Quest complete! +'+q.reward.toLocaleString()+' coins!');
 }
+
 function rQuests(){
+  checkQuestReset();
+  const today=todayStamp();
+  const week=weekStamp();
+  const nextDay=new Date(today+86400000);
+  const nextWeek=new Date(week+7*86400000);
+  const fmtDate=d=>`${d.getUTCMonth()+1}/${d.getUTCDate()}`;
+
   const R=q=>{
     const pct=Math.min(100,Math.round((q.progress||0)/q.goal*100));
-    const done=q.progress>=q.goal;
+    const done=(q.progress||0)>=q.goal;
     return`<div class="qcard">
       <div class="qtype">${q.daily?'DAILY':'WEEKLY'}</div>
       <div class="qtitle">${q.title}</div>
@@ -1336,13 +1553,27 @@ function rQuests(){
       <div class="qfoot">
         <div class="qrwd">Coins ${q.reward.toLocaleString()}</div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:600;">
-          ${q.claimed?`<span style="color:var(--dim)">CLAIMED</span>`:done?`<button class="bclaim" onclick="claimQ('${q.id}')">CLAIM!</button>`:`<span style="color:var(--dim)">${q.progress||0}/${q.goal}</span>`}
+          ${q.claimed
+            ?`<span style="color:var(--dim)">CLAIMED</span>`
+            :done
+              ?`<button class="bclaim" onclick="claimQ('${q.id}')">CLAIM!</button>`
+              :`<span style="color:var(--dim)">${q.progress||0}/${q.goal}</span>`}
         </div>
       </div>
     </div>`;
   };
-  document.getElementById('dq').innerHTML=S.quests.filter(q=>q.daily).map(R).join('');
-  document.getElementById('wq').innerHTML=S.quests.filter(q=>!q.daily).map(R).join('');
+
+  document.getElementById('dq').innerHTML=`
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dim);margin-bottom:10px;">
+      Resets daily at midnight UTC &nbsp;·&nbsp; Next reset: ${fmtDate(nextDay)}
+    </div>`
+    +S.quests.filter(q=>q.daily).map(R).join('');
+
+  document.getElementById('wq').innerHTML=`
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dim);margin-bottom:10px;">
+      Resets every Monday UTC &nbsp;·&nbsp; Next reset: ${fmtDate(nextWeek)}
+    </div>`
+    +S.quests.filter(q=>!q.daily).map(R).join('');
 }
 </script>
 </body>
