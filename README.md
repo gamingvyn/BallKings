@@ -2,7 +2,7 @@
 
 A fully browser-based basketball card game with arcade gameplay, 600+ player cards, a live transfer market, and progression systems. No build step, no server — pure HTML/CSS/JS.
 
-**Live at:** `https://gamingvyn.github.io/BallKings/`
+**Live at:** [BallKings](https://gamingvyn.github.io/BallKings/)
 
 ---
 
