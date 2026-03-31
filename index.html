@@ -434,61 +434,85 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
   </nav>
 
   <div id="s-home"   class="sec on"><div id="home-in"></div></div>
-  <div id="s-play"   class="sec">
+  <div id="s-play" class="sec">
     <div class="ptitle">MATCH <span>SIMULATOR</span></div>
-    <div class="match-box" id="match-box">
-      <div style="font-family:'Barlow Condensed',sans-serif;color:var(--dim);font-size:.86rem;margin-bottom:14px;">
-        Better players = higher chance of winning. Build your team in the Team tab.
-      </div>
-      <div class="match-row">
-        <div class="mtm">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">YOUR TEAM</div>
-          <div class="mtm-ovr" id="my-ovr">--</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);">OVR</div>
+
+    <!-- ── PRE-GAME: opponent reveal + OVR bar ── -->
+    <div id="pregame-panel">
+      <div class="match-box" id="match-box">
+        <div style="font-family:'Barlow Condensed',sans-serif;color:var(--dim);font-size:.86rem;margin-bottom:14px;">
+          One opponent, 4 quarters. Simulate each quarter one at a time.
         </div>
-        <div class="mvs">VS</div>
-        <div class="mtm">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">OPPONENT</div>
-          <div class="mtm-ovr cpu" id="opp-ovr">--</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);">OVR</div>
-        </div>
-      </div>
-      <button class="sim-btn" id="sim-btn" onclick="runSim()">SIMULATE MATCH</button>
-      <!-- OVR matchup shown above button -->
-      <div id="ovr-bar" style="margin-top:16px;background:var(--surf2);border-radius:10px;padding:12px 16px;display:none;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:8px;text-align:center;">TEAM OVERALL COMPARISON</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--acc);min-width:36px;text-align:right;" id="ovr-bar-me">--</span>
-          <div style="flex:1;height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;position:relative;">
-            <div id="ovr-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px;transition:width .6s;"></div>
+        <div class="match-row">
+          <div class="mtm">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">YOUR TEAM</div>
+            <div class="mtm-ovr" id="my-ovr">--</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);">OVR</div>
           </div>
-          <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--red);min-width:36px;" id="ovr-bar-opp">--</span>
+          <div class="mvs">VS</div>
+          <div class="mtm">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">OPPONENT</div>
+            <div class="mtm-ovr cpu" id="opp-ovr">--</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);">OVR</div>
+          </div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;">
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);">YOU</span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);">CPU</span>
+        <!-- OVR comparison bar -->
+        <div id="ovr-bar" style="margin-bottom:16px;background:var(--surf2);border-radius:10px;padding:12px 16px;display:none;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:8px;text-align:center;">TEAM OVERALL COMPARISON</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--acc);min-width:36px;text-align:right;" id="ovr-bar-me">--</span>
+            <div style="flex:1;height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;position:relative;">
+              <div id="ovr-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px;transition:width .6s;"></div>
+            </div>
+            <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:var(--red);min-width:36px;" id="ovr-bar-opp">--</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);">YOU</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);">CPU</span>
+          </div>
+        </div>
+        <button class="sim-btn" id="sim-btn" onclick="startGame()">KICK OFF MATCH</button>
+      </div>
+    </div>
+
+    <!-- ── IN-GAME: live scoreboard + quarter log ── -->
+    <div id="ingame-panel" style="display:none;">
+      <!-- Running scoreboard -->
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px 20px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="text-align:center;flex:1;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:2px;">YOU</div>
+            <div style="font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--acc);line-height:1;" id="live-score-me">0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--dim);" id="live-quarter-label">Q1</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);margin-top:2px;" id="live-quarter-sub">of 4</div>
+          </div>
+          <div style="text-align:center;flex:1;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:2px;">CPU</div>
+            <div style="font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--red);line-height:1;" id="live-score-cpu">0</div>
+          </div>
+        </div>
+        <!-- Quarter-by-quarter score tracker -->
+        <div id="quarter-tracker" style="display:flex;gap:6px;margin-top:12px;border-top:1px solid var(--bdr);padding-top:10px;overflow-x:auto;"></div>
+      </div>
+
+      <!-- Play-by-play log -->
+      <div id="log-wrap" style="background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:2px;color:var(--dim);margin-bottom:10px;" id="log-quarter-title">QUARTER 1 PLAY-BY-PLAY</div>
+        <div class="log-events" id="log-ev" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
+        <div style="margin-top:14px;display:flex;gap:9px;flex-wrap:wrap;" id="game-btns">
+          <button class="sim-btn" id="btn-next-q" style="display:none;font-size:1.1rem;padding:11px 28px;" onclick="simNextQuarter()">SIMULATE Q<span id="next-q-num">2</span></button>
+          <button class="bprim" id="btn-new-game" style="display:none;" onclick="startNewGame()">START NEW GAME</button>
+          <button class="bsec" onclick="nav('team')">MANAGE TEAM</button>
         </div>
       </div>
-    </div><!-- /#match-box -->
-    <div id="log-wrap">
-      <div class="log-sb">
-        <div class="log-side">
-          <div class="log-slbl">YOU</div>
-          <div class="log-snum" id="ls-home">0</div>
-        </div>
-        <div class="log-mid">
-          <div class="log-final">FINAL</div>
-          <div class="log-res" id="ls-res"></div>
-        </div>
-        <div class="log-side">
-          <div class="log-slbl">CPU</div>
-          <div class="log-snum cpu" id="ls-away">0</div>
-        </div>
-      </div>
-      <div class="log-events" id="log-ev"></div>
-      <div style="margin-top:12px;display:flex;gap:9px;flex-wrap:wrap;">
-        <button class="bprim" id="btn-play-again" style="display:none;" onclick="rPlay();runSim()">PLAY AGAIN</button>
-        <button class="bsec"  onclick="nav('team')">MANAGE TEAM</button>
+
+      <!-- Final result banner (shown after Q4) -->
+      <div id="final-banner" style="display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:20px;margin-top:14px;text-align:center;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:3px;" id="final-result-title">FINAL</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;color:var(--dim);margin-top:4px;" id="final-result-sub"></div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.2rem;margin-top:8px;" id="final-coins-label"></div>
       </div>
     </div>
   </div>
@@ -514,7 +538,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
     <div class="ptitle">TEAM <span>BUILDER</span></div>
     <div class="team-layout">
       <div class="lineup-box">
-        <div class="lu-title">LINEUP</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+          <div class="lu-title" style="margin:0;">LINEUP</div>
+          <button onclick="autoBuild()" style="background:var(--acc2);border:none;border-radius:6px;color:#fff;padding:5px 12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1px;cursor:pointer;transition:all .2s;" onmouseover="this.style.filter='brightness(1.15)'" onmouseout="this.style.filter=''">AUTO-BUILD</button>
+        </div>
         <div id="lu-slots"></div>
         <div style="border-top:1px solid var(--bdr);padding-top:11px;margin-top:3px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'Barlow Condensed',sans-serif;color:var(--dim);font-size:.82rem;">TEAM OVR</span>
@@ -789,7 +816,7 @@ let S={
   coins:1000,xp:0,level:1,
   collection:[],team:[null,null,null,null,null],
   marketCards:[],marketRefreshIn:300,
-  quests:[],stats:{wins:0,losses:0,points:0,matches:0},
+  quests:[],stats:{wins:0,losses:0,draws:0,points:0,matches:0},
 };
 let USER=null;
 let saveT=null;
@@ -1094,19 +1121,18 @@ function showDet(id){
             <div class="sbar"><div class="sbarf" style="width:${c.stats[k]}%"></div></div>
             <span class="sval">${c.stats[k]}</span>
           </div>`).join('')}
-        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-          ${owned&&!inTeam?`<button class="bprim" onclick="qAddTeam('${id}');closeMod();">ADD TO TEAM</button>`:''}
-          ${owned?`<span style="color:var(--grn);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.9rem;padding-top:5px;">IN COLLECTION</span>`:''}
+        <div style="margin-top:14px;">
+          ${owned
+            ? inTeam
+              ? `<span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;">IN LINEUP</span>`
+              : `<span style="color:var(--grn);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;">IN COLLECTION</span>
+                 <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dim);margin-top:4px;">To add to lineup: go to Team tab, select a slot, then pick this player.</div>`
+            : `<span style="color:var(--dim);font-family:'Barlow Condensed',sans-serif;font-size:.85rem;">Not in your collection</span>`
+          }
         </div>
       </div>
     </div>`;
   document.getElementById('modal').classList.add('on');
-}
-function qAddTeam(id){
-  const e=S.team.indexOf(null);
-  if(e>=0){S.team[e]=id;toast('Added to lineup!');}
-  else{S.team[4]=id;toast('Replaced last slot!');}
-  doSave();
 }
 function showRev(card){
   document.getElementById('rev-in').innerHTML=`<div style="transform:scale(1.3);">${cardH(card)}</div>`;
@@ -1127,7 +1153,7 @@ function rHome(){
       <div class="xpbw"><div class="xpb" style="width:${xpp}%"></div></div>
     </div>
     <div class="stat-cards">
-      ${[['MATCHES',S.stats.matches],['WINS',S.stats.wins],['POINTS',S.stats.points],['CARDS',S.collection.length]].map(([l,v])=>`
+      ${[['MATCHES',S.stats.matches],['WINS',S.stats.wins],['DRAWS',S.stats.draws||0],['POINTS',S.stats.points],['CARDS',S.collection.length]].map(([l,v])=>`
         <div class="sc"><div class="sc-v">${v}</div><div class="sc-l">${l}</div></div>`).join('')}
     </div>
     <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:24px;">
@@ -1141,31 +1167,28 @@ function rHome(){
     </div>`;
 }
 
-// ─── PLAY ─────────────────────────────────────────────────────
+// ─── PLAY / MATCH ENGINE ──────────────────────────────────────
 const POS_ORDER=['PG','SG','SF','PF','C'];
+let GAME=null; // live match state persists across quarters
 
 function rPlay(){
+  document.getElementById('pregame-panel').style.display='block';
+  document.getElementById('ingame-panel').style.display='none';
+  GAME=null;
   const my=teamOVR();
-  const opp=Math.max(30,Math.min(102,my+rng(-12,12)));
+  const opp=Math.max(30,Math.min(102,my+rng(-18,18)));
   document.getElementById('my-ovr').textContent=my;
   document.getElementById('opp-ovr').textContent=opp;
-  document.getElementById('log-wrap').style.display='none';
-  const b=document.getElementById('sim-btn');
-  if(b) b.disabled=false;
-  const pa=document.getElementById('btn-play-again');
-  if(pa) pa.style.display='none';
-
-  // Show OVR comparison bar
   const bar=document.getElementById('ovr-bar');
   if(bar){
     bar.style.display='block';
     document.getElementById('ovr-bar-me').textContent=my;
     document.getElementById('ovr-bar-opp').textContent=opp;
-    // Fill width represents your team's share of total OVR (capped at 100%)
-    const total=my+opp||1;
-    const pct=Math.round((my/total)*100);
+    const pct=Math.round((my/(my+opp||1))*100);
     document.getElementById('ovr-bar-fill').style.width=pct+'%';
   }
+  const btn=document.getElementById('sim-btn');
+  if(btn){btn.disabled=false;btn.textContent='KICK OFF MATCH';}
 }
 
 function validateTeam(){
@@ -1182,88 +1205,184 @@ function validateTeam(){
   return true;
 }
 
-function runSim(){
+function startGame(){
   if(!validateTeam()) return;
-  const myOVR=teamOVR();
-  const oppOVR=parseInt(document.getElementById('opp-ovr').textContent)||50;
   const simBtn=document.getElementById('sim-btn');
   if(simBtn) simBtn.disabled=true;
-  const pa=document.getElementById('btn-play-again');
-  if(pa) pa.style.display='none';
+  const myOVR=teamOVR();
+  const oppOVR=parseInt(document.getElementById('opp-ovr').textContent)||50;
+  GAME={
+    myOVR,oppOVR,
+    scoreMe:0,scoreCpu:0,
+    currentQ:0,
+    qScores:[],
+    myNames:S.team.filter(Boolean).map(id=>gc(id)).filter(Boolean).map(c=>c.name.split(' ').pop()),
+    cpuNames:['Williams','Johnson','Smith','Brown','Davis','Jackson','Thompson','Wilson','Moore','Taylor'],
+    myScoringRate:0.42+(myOVR/100)*0.16,
+    cpuScoringRate:0.42+(oppOVR/100)*0.16,
+    winChance:Math.max(0.10,Math.min(0.90,0.5+(myOVR-oppOVR)*0.015)),
+  };
+  if(!GAME.myNames.length) GAME.myNames=['Player'];
+  document.getElementById('pregame-panel').style.display='none';
+  document.getElementById('ingame-panel').style.display='block';
+  document.getElementById('live-score-me').textContent='0';
+  document.getElementById('live-score-cpu').textContent='0';
+  document.getElementById('quarter-tracker').innerHTML='';
+  document.getElementById('log-ev').innerHTML='';
+  document.getElementById('final-banner').style.display='none';
+  document.getElementById('btn-next-q').style.display='none';
+  document.getElementById('btn-new-game').style.display='none';
+  simNextQuarter();
+}
 
-  const myPlayers=S.team.filter(Boolean).map(id=>gc(id)).filter(Boolean);
-  const myNames=myPlayers.length?myPlayers.map(c=>c.name.split(' ').pop()):['Player'];
-  const cpuNames=['Williams','Johnson','Smith','Brown','Davis','Jackson','Thompson'];
+function simNextQuarter(){
+  if(!GAME) return;
+  GAME.currentQ++;
+  const q=GAME.currentQ;
+  const btnNext=document.getElementById('btn-next-q');
+  const btnNew=document.getElementById('btn-new-game');
+  if(btnNext) btnNext.style.display='none';
+  if(btnNew)  btnNew.style.display='none';
+  document.getElementById('live-quarter-label').textContent='Q'+q;
+  document.getElementById('log-quarter-title').textContent='QUARTER '+q+' PLAY-BY-PLAY';
+  document.getElementById('log-ev').innerHTML='';
 
   const events=[];
-  let scoreMe=0,scoreCpu=0;
-  const myAdv=myOVR/100, cpuAdv=oppOVR/100;
-  const plays=rng(75,105);
-  let time=0;
-
-  for(let i=0;i<plays;i++){
-    time+=rng(8,24);
-    const q=Math.min(4,Math.floor(time/(12*60))+1);
-    const mins=12-Math.floor((time%(12*60))/60);
+  let qMe=0,qCpu=0;
+  const PLAYS=rng(20,26);
+  for(let p=0;p<PLAYS;p++){
+    const mins=11-Math.floor(p*(12/PLAYS));
     const secs=rng(0,59);
-    const ts=`Q${q} ${mins}:${secs<10?'0':''}${secs}`;
-    const myPoss=Math.random()<0.5;
-    const att=myPoss?myNames[rng(0,myNames.length-1)]:cpuNames[rng(0,cpuNames.length-1)];
-    const def=myPoss?cpuNames[rng(0,cpuNames.length-1)]:myNames[rng(0,myNames.length-1)];
-    const sc=myPoss?myAdv*0.52:cpuAdv*0.52;
+    const ts='Q'+q+' '+mins+':'+(secs<10?'0':'')+secs;
+    const myPoss=Math.random()<(GAME.myOVR/(GAME.myOVR+GAME.oppOVR));
+    const att=myPoss?GAME.myNames[rng(0,GAME.myNames.length-1)]:GAME.cpuNames[rng(0,GAME.cpuNames.length-1)];
+    const def=myPoss?GAME.cpuNames[rng(0,GAME.cpuNames.length-1)]:GAME.myNames[rng(0,GAME.myNames.length-1)];
+    const sc=myPoss?GAME.myScoringRate:GAME.cpuScoringRate;
     const r=Math.random();
     if(r<sc){
-      const pts=Math.random()<0.30?3:2;
-      if(myPoss){scoreMe+=pts;events.push({ts,txt:`${att} ${pts===3?'drains the 3!':'finishes at the rim!'} (+${pts})`,cls:'sc'});}
-      else{scoreCpu+=pts;events.push({ts,txt:`${att} ${pts===3?'nails a 3!':'converts inside!'} (+${pts})`,cls:'cs'});}
-    } else if(r<sc+0.10){
-      events.push({ts,txt:`${att} — ${['bad pass','travels','shot clock violation','out of bounds'][rng(0,3)]}`,cls:'to'});
-    } else if(r<sc+0.14){
-      const made=rng(1,2);
-      if(myPoss) scoreMe+=made; else scoreCpu+=made;
-      events.push({ts,txt:`${def} fouls ${att} — ${made}/2 free throws made`,cls:'fo'});
+      const pts=Math.random()<0.28?3:2;
+      if(myPoss){
+        qMe+=pts;
+        const msg=pts===3?[att+' from deep — SPLASH!',att+' steps back — 3!',att+' cold-blooded triple!'][rng(0,2)]:[att+' drives and finishes!',att+' post move — good!',att+' cuts — scores!'][rng(0,2)];
+        events.push({ts,txt:msg+' (+'+pts+')',cls:'sc'});
+      } else {
+        qCpu+=pts;
+        const msg=pts===3?[att+' nails the 3!',att+' from the corner!',att+' drains it!'][rng(0,2)]:[att+' converts inside!',att+' layup — 2!',att+' mid-range — good!'][rng(0,2)];
+        events.push({ts,txt:msg+' (+'+pts+')',cls:'cs'});
+      }
+    } else if(r<sc+0.09){
+      events.push({ts,txt:att+' — '+['bad pass','travels','shot clock','out of bounds'][rng(0,3)]+' turnover',cls:'to'});
+    } else if(r<sc+0.13){
+      const made=rng(0,2);
+      if(made>0){if(myPoss)qMe+=made;else qCpu+=made;}
+      events.push({ts,txt:def+' fouls '+att+' — '+made+'/2 free throws',cls:'fo'});
     } else {
-      events.push({ts,txt:`${att} misses the ${Math.random()<0.38?'three':'mid-range'}`,cls:''});
+      events.push({ts,txt:att+' misses the '+(Math.random()<0.35?'3-pointer':'mid-range')+(Math.random()<0.28?' — '+def+' rebounds':''),cls:''});
     }
   }
-
-  const won=scoreMe>scoreCpu;
-  const coins=won?150+scoreMe*2:40+scoreMe;
-  S.coins+=coins; S.stats.matches++; S.stats.points+=scoreMe;
-  if(won) S.stats.wins++; else S.stats.losses++;
-  updQProg('matches',1); updQProg('points',scoreMe);
-  if(won) updQProg('wins',1);
-  addXP(won?80:25); updNav(); doSave();
-
-  document.getElementById('ls-home').textContent=scoreMe;
-  document.getElementById('ls-away').textContent=scoreCpu;
-  const res=document.getElementById('ls-res');
-  res.textContent=won?`VICTORY! +${coins} coins`:`DEFEAT — +${coins} coins`;
-  res.style.color=won?'var(--grn)':'var(--red)';
+  GAME.scoreMe+=qMe;GAME.scoreCpu+=qCpu;
+  GAME.qScores.push({me:qMe,cpu:qCpu});
 
   const lev=document.getElementById('log-ev');
-  lev.innerHTML='';
-  document.getElementById('log-wrap').style.display='block';
-  document.getElementById('log-wrap').scrollIntoView({behavior:'smooth',block:'start'});
-
   let idx=0;
   function next(){
-    if(idx>=events.length){
-      // Only NOW re-enable buttons after ALL events have streamed in
-      if(simBtn) simBtn.disabled=false;
-      if(pa) pa.style.display='inline-block';
-      toast(won?`VICTORY! +${coins} coins`:`Tough loss. +${coins} coins`);
-      return;
+    if(idx<events.length){
+      const ev=events[idx++];
+      const d=document.createElement('div');
+      d.className='lev '+ev.cls;
+      d.innerHTML='<span class="lt">'+ev.ts+'</span>'+ev.txt;
+      lev.appendChild(d);lev.scrollTop=lev.scrollHeight;
+      setTimeout(next,42);
+    } else {
+      document.getElementById('live-score-me').textContent=GAME.scoreMe;
+      document.getElementById('live-score-cpu').textContent=GAME.scoreCpu;
+      updateQuarterTracker();
+      if(q<4){
+        const summary=document.createElement('div');
+        summary.style.cssText='font-family:"Bebas Neue",cursive;font-size:.82rem;letter-spacing:2px;color:var(--dim);padding:8px 4px 2px;border-top:1px solid var(--bdr);margin-top:6px;';
+        summary.textContent='END Q'+q+' — YOU '+GAME.scoreMe+' : CPU '+GAME.scoreCpu;
+        lev.appendChild(summary);lev.scrollTop=lev.scrollHeight;
+        document.getElementById('next-q-num').textContent=q+1;
+        if(btnNext) btnNext.style.display='inline-block';
+      } else {
+        resolveMatch();
+      }
     }
-    const ev=events[idx++];
-    const d=document.createElement('div');
-    d.className='lev '+ev.cls;
-    d.innerHTML=`<span class="lt">${ev.ts}</span>${ev.txt}`;
-    lev.appendChild(d);lev.scrollTop=lev.scrollHeight;
-    setTimeout(next,50);
   }
   next();
 }
+
+function updateQuarterTracker(){
+  const el=document.getElementById('quarter-tracker');
+  el.innerHTML=GAME.qScores.map(function(qs,i){
+    const mec=qs.me>qs.cpu?'var(--acc)':qs.me<qs.cpu?'var(--red)':'var(--dim)';
+    const cpc=qs.cpu>qs.me?'var(--red)':qs.cpu<qs.me?'var(--grn)':'var(--dim)';
+    return '<div style="flex:1;min-width:56px;background:var(--surf2);border-radius:7px;padding:6px 8px;text-align:center;border:1px solid var(--bdr);">'
+      +'<div style="font-family:\'Bebas Neue\',cursive;font-size:.7rem;color:var(--dim);letter-spacing:1px;">Q'+(i+1)+'</div>'
+      +'<div style="font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:'+mec+';">'+qs.me+'</div>'
+      +'<div style="font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:'+cpc+';">'+qs.cpu+'</div>'
+      +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:.58rem;color:var(--dim);">YOU/CPU</div></div>';
+  }).join('');
+}
+
+function resolveMatch(){
+  // OT if tied
+  if(GAME.scoreMe===GAME.scoreCpu){
+    const lev=document.getElementById('log-ev');
+    const hd=document.createElement('div');
+    hd.style.cssText='font-family:"Bebas Neue",cursive;font-size:.9rem;letter-spacing:2px;color:var(--gold);padding:10px 4px 4px;border-top:2px solid var(--gold);margin-top:8px;';
+    hd.textContent='--- OVERTIME ---';
+    lev.appendChild(hd);lev.scrollTop=lev.scrollHeight;
+    for(let p=0;p<8;p++){
+      const myP=Math.random()<0.5;
+      if(Math.random()<(myP?GAME.myScoringRate*1.1:GAME.cpuScoringRate*1.1)){
+        const pts=Math.random()<0.25?3:2;
+        if(myP)GAME.scoreMe+=pts;else GAME.scoreCpu+=pts;
+      }
+    }
+    document.getElementById('live-score-me').textContent=GAME.scoreMe;
+    document.getElementById('live-score-cpu').textContent=GAME.scoreCpu;
+  }
+  // OVR nudge
+  if(GAME.scoreMe!==GAME.scoreCpu){
+    const shouldWin=Math.random()<GAME.winChance;
+    const winning=GAME.scoreMe>GAME.scoreCpu;
+    if(winning&&!shouldWin){GAME.scoreCpu=GAME.scoreMe+rng(1,5);}
+    else if(!winning&&shouldWin){GAME.scoreMe=GAME.scoreCpu+rng(1,5);}
+    document.getElementById('live-score-me').textContent=GAME.scoreMe;
+    document.getElementById('live-score-cpu').textContent=GAME.scoreCpu;
+  }
+  const won=GAME.scoreMe>GAME.scoreCpu;
+  const draw=GAME.scoreMe===GAME.scoreCpu;
+  const lost=GAME.scoreMe<GAME.scoreCpu;
+  let coinDelta,xpGain;
+  if(won){coinDelta=150+GAME.scoreMe*2;xpGain=80;}
+  else if(draw){coinDelta=30;xpGain=40;}
+  else{const pen=Math.round(20+Math.abs(GAME.scoreCpu-GAME.scoreMe)*2);coinDelta=-Math.min(pen,Math.floor(S.coins*0.15));xpGain=15;}
+  S.coins=Math.max(0,S.coins+coinDelta);
+  S.stats.matches++;S.stats.points+=GAME.scoreMe;
+  if(won)S.stats.wins++;
+  else if(lost)S.stats.losses++;
+  else S.stats.draws=(S.stats.draws||0)+1;
+  updQProg('matches',1);updQProg('points',GAME.scoreMe);
+  if(won)updQProg('wins',1);
+  addXP(xpGain);updNav();doSave();
+  const banner=document.getElementById('final-banner');
+  const title=document.getElementById('final-result-title');
+  const sub=document.getElementById('final-result-sub');
+  const coinsEl=document.getElementById('final-coins-label');
+  banner.style.display='block';
+  if(won){title.textContent='VICTORY!';title.style.color='var(--grn)';coinsEl.textContent='+'+coinDelta+' coins earned';coinsEl.style.color='var(--gold)';}
+  else if(draw){title.textContent='DRAW!';title.style.color='var(--gold)';coinsEl.textContent='+'+coinDelta+' coins';coinsEl.style.color='var(--gold)';}
+  else{title.textContent='DEFEAT';title.style.color='var(--red)';coinsEl.textContent=coinDelta+' coins lost';coinsEl.style.color='var(--red)';}
+  sub.textContent='Final: YOU '+GAME.scoreMe+' — CPU '+GAME.scoreCpu;
+  document.getElementById('btn-new-game').style.display='inline-block';
+  toast(won?'VICTORY! +'+coinDelta+' coins':draw?'DRAW! +'+coinDelta+' coins':'DEFEAT — '+Math.abs(coinDelta)+' coins lost',3500);
+}
+
+function startNewGame(){GAME=null;rPlay();}
+function runSim(){startGame();}
+
 
 // ─── COLLECTION ───────────────────────────────────────────────
 let cfilt='all';
@@ -1290,31 +1409,62 @@ function rCards(){
 
 // ─── TEAM ─────────────────────────────────────────────────────
 let selSlot=null;
+
+function autoBuild(){
+  // For each position slot, find the highest OVR card the user owns for that position
+  POS_ORDER.forEach((pos,i)=>{
+    const best=S.collection
+      .map(id=>gc(id))
+      .filter(c=>c&&c.pos===pos)
+      .sort((a,b)=>b.ovr-a.ovr)[0];
+    S.team[i]=best?best.id:null;
+  });
+  selSlot=null;
+  doSave();
+  rTeam();
+  toast('Auto-built! Best players assigned to each position.');
+}
+
 function rTeam(){
-  const pos=['PG','SG','SF','PF','C'];
+  const pos=POS_ORDER;
   document.getElementById('lu-slots').innerHTML=pos.map((p,i)=>{
     const cid=S.team[i];const card=cid?gc(cid):null;
-    return`<div class="slot${selSlot===i?' sel':''}" onclick="selSl(${i})" id="sl-${i}">
+    const isSelected=selSlot===i;
+    return`<div class="slot${isSelected?' sel':''}" onclick="selSl(${i})" id="sl-${i}">
       <div class="slot-pos">${p}</div>
-      <div class="slot-thumb">${card?`<img src="${photo(card.pid,card.name)}" onerror="this.style.display='none'" alt="">`:'&nbsp;'}</div>
+      <div class="slot-thumb">
+        ${card
+          ? `<img src="${photo(card.pid,card.name)}" onerror="this.style.display='none'" alt="">`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);">+</div>`}
+      </div>
       <div class="slot-info">
         <div class="slot-name">${card?card.name:'Empty'}</div>
-        <div class="slot-sub">${card?VL[card.variant]:'Click to assign'}</div>
+        <div class="slot-sub">${card?VL[card.variant]+' · OVR '+card.ovr:'Click to select'}</div>
       </div>
       ${card?`<div class="slot-ovr">${card.ovr}</div>`:''}
     </div>`;
   }).join('');
   document.getElementById('team-ovr').textContent=teamOVR();
-  const roster=S.collection.map(id=>gc(id)).filter(Boolean).sort((a,b)=>b.ovr-a.ovr);
-  document.getElementById('rgrid').innerHTML=roster.map(c=>`
-    <div onclick="asgn('${c.id}')" style="cursor:pointer;">${cardH(c,S.team.includes(c.id))}</div>`).join('')
-    ||`<div style="color:var(--dim);padding:14px;font-family:'Barlow Condensed',sans-serif;">Open packs to get players!</div>`;
+
+  // Roster — filtered to match selected slot position if one is active
+  const allCards=S.collection.map(id=>gc(id)).filter(Boolean).sort((a,b)=>b.ovr-a.ovr);
+  const filtered=selSlot!==null?allCards.filter(c=>c.pos===POS_ORDER[selSlot]):allCards;
+  const empty=`<div style="color:var(--dim);padding:14px;font-family:'Barlow Condensed',sans-serif;">
+    ${selSlot!==null?'No '+POS_ORDER[selSlot]+' cards in collection — open packs!':'Open packs to get players!'}
+  </div>`;
+  document.getElementById('rgrid').innerHTML=filtered.map(c=>`
+    <div onclick="asgn('${c.id}')" style="cursor:pointer;position:relative;">
+      ${cardH(c,S.team.includes(c.id))}
+    </div>`).join('')||empty;
 }
+
 function selSl(i){
   selSlot=i;
-  document.querySelectorAll('.slot').forEach((el,idx)=>el.classList.toggle('sel',idx===i));
-  toast('Slot '+(i+1)+' selected ('+POS_ORDER[i]+') — now pick a player from the roster');
+  // Re-render so roster filters to that position
+  rTeam();
+  toast('Slot '+(i+1)+' ('+POS_ORDER[i]+') selected — pick a player below');
 }
+
 function asgn(id){
   if(selSlot===null){
     toast('Select a lineup slot first!');
@@ -1330,7 +1480,7 @@ function asgn(id){
   S.team[selSlot]=id;
   selSlot=null;
   doSave();rTeam();
-  toast(card.name+' assigned!');
+  toast(card.name+' assigned to lineup!');
 }
 
 // ─── MARKET ───────────────────────────────────────────────────
