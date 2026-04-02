@@ -6,11 +6,20 @@
 <title>BallKings</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE — classic script tag version (no npm, no build step)
+     Works directly on GitHub Pages with plain copy-paste.
+════════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+  // ┌─────────────────────────────────────────────────────────┐
+  // │  PASTE YOUR FIREBASE CONFIG HERE                        │
+  // │  console.firebase.google.com → your project →          │
+  // │  Project Settings → Your apps → Web app → Config       │
+  // └─────────────────────────────────────────────────────────┘
   const firebaseConfig = {
     apiKey:            "AIzaSyDNBobfxE0zbpJjP8Bh97Csox2nC6_A4QY",
     authDomain:        "ballkings.firebaseapp.com",
@@ -477,42 +486,49 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
 
     <!-- ── IN-GAME: live scoreboard + quarter log ── -->
     <div id="ingame-panel" style="display:none;">
-      <!-- Running scoreboard -->
-      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px 20px;margin-bottom:14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <!-- ── Live scoreboard ── -->
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px 18px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
           <div style="text-align:center;flex:1;">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:2px;">YOU</div>
-            <div style="font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--acc);line-height:1;" id="live-score-me">0</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);letter-spacing:1px;margin-bottom:1px;">YOU</div>
+            <div style="font-family:'Bebas Neue',cursive;font-size:3.2rem;color:var(--acc);line-height:1;" id="live-score-me">0</div>
           </div>
-          <div style="text-align:center;">
-            <div style="font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--dim);" id="live-quarter-label">Q1</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);margin-top:2px;" id="live-quarter-sub">of 4</div>
+          <div style="text-align:center;padding:0 8px;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:1.3rem;color:var(--dim);line-height:1;" id="live-quarter-label">Q1</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.65rem;color:var(--dim);margin-top:1px;">IN PROGRESS</div>
           </div>
           <div style="text-align:center;flex:1;">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);letter-spacing:1px;margin-bottom:2px;">CPU</div>
-            <div style="font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--red);line-height:1;" id="live-score-cpu">0</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);letter-spacing:1px;margin-bottom:1px;">CPU</div>
+            <div style="font-family:'Bebas Neue',cursive;font-size:3.2rem;color:var(--red);line-height:1;" id="live-score-cpu">0</div>
           </div>
         </div>
-        <!-- Quarter-by-quarter score tracker -->
-        <div id="quarter-tracker" style="display:flex;gap:6px;margin-top:12px;border-top:1px solid var(--bdr);padding-top:10px;overflow-x:auto;"></div>
+        <!-- Quarter score grid -->
+        <div id="quarter-tracker" style="display:flex;gap:5px;margin-top:10px;border-top:1px solid var(--bdr);padding-top:8px;overflow-x:auto;"></div>
       </div>
 
-      <!-- Play-by-play log -->
-      <div id="log-wrap" style="background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;">
-        <div style="font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:2px;color:var(--dim);margin-bottom:10px;" id="log-quarter-title">QUARTER 1 PLAY-BY-PLAY</div>
-        <div class="log-events" id="log-ev" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
-        <div style="margin-top:14px;display:flex;gap:9px;flex-wrap:wrap;" id="game-btns">
-          <button class="sim-btn" id="btn-next-q" style="display:none;font-size:1.1rem;padding:11px 28px;" onclick="simNextQuarter()">SIMULATE Q<span id="next-q-num">2</span></button>
-          <button class="bprim" id="btn-new-game" style="display:none;" onclick="startNewGame()">START NEW GAME</button>
-          <button class="bsec" onclick="nav('team')">MANAGE TEAM</button>
-        </div>
+      <!-- ── Full game log (all quarters, persistent) ── -->
+      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:.95rem;letter-spacing:2px;color:var(--dim);margin-bottom:8px;" id="log-quarter-title">QUARTER 1 — PLAY BY PLAY</div>
+        <div id="log-ev" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
       </div>
 
-      <!-- Final result banner (shown after Q4) -->
-      <div id="final-banner" style="display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:20px;margin-top:14px;text-align:center;">
-        <div style="font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:3px;" id="final-result-title">FINAL</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;color:var(--dim);margin-top:4px;" id="final-result-sub"></div>
-        <div style="font-family:'Bebas Neue',cursive;font-size:1.2rem;margin-top:8px;" id="final-coins-label"></div>
+      <!-- ── Quarter analysis cards (appended after each quarter) ── -->
+      <div id="q-analysis-wrap"></div>
+
+      <!-- ── Action buttons ── -->
+      <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="sim-btn" id="btn-next-q" style="display:none;font-size:1.05rem;padding:12px 28px;" onclick="simNextQuarter()">PLAY Q<span id="next-q-num">2</span></button>
+        <button class="bprim"  id="btn-new-game" style="display:none;" onclick="startNewGame()">START NEW GAME</button>
+        <button class="bsec"   onclick="nav('team')">MANAGE TEAM</button>
+      </div>
+
+      <!-- ── Final result banner ── -->
+      <div id="final-banner" style="display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:22px;text-align:center;margin-bottom:14px;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:2.4rem;letter-spacing:3px;" id="final-result-title">FINAL</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:var(--dim);margin-top:4px;" id="final-result-sub"></div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.15rem;margin-top:6px;" id="final-coins-label"></div>
+        <!-- Full match analysis table -->
+        <div id="match-analysis" style="margin-top:18px;text-align:left;"></div>
       </div>
     </div>
   </div>
@@ -1215,23 +1231,34 @@ function startGame(){
     myOVR,oppOVR,
     scoreMe:0,scoreCpu:0,
     currentQ:0,
-    qScores:[],
+    qScores:[],          // {me,cpu,events,myScorers,cpuScorers,myTO,cpuTO,myFouls,cpuFouls}
     myNames:S.team.filter(Boolean).map(id=>gc(id)).filter(Boolean).map(c=>c.name.split(' ').pop()),
     cpuNames:['Williams','Johnson','Smith','Brown','Davis','Jackson','Thompson','Wilson','Moore','Taylor'],
     myScoringRate:0.42+(myOVR/100)*0.16,
     cpuScoringRate:0.42+(oppOVR/100)*0.16,
     winChance:Math.max(0.10,Math.min(0.90,0.5+(myOVR-oppOVR)*0.015)),
+    // running scorer totals across whole match
+    myScorersTotal:{},
+    cpuScorersTotal:{},
+    myTOTotal:0,cpuTOTotal:0,
+    myFoulsTotal:0,cpuFoulsTotal:0,
+    my2Total:0,my3Total:0,cpu2Total:0,cpu3Total:0,
   };
   if(!GAME.myNames.length) GAME.myNames=['Player'];
+
   document.getElementById('pregame-panel').style.display='none';
   document.getElementById('ingame-panel').style.display='block';
   document.getElementById('live-score-me').textContent='0';
   document.getElementById('live-score-cpu').textContent='0';
   document.getElementById('quarter-tracker').innerHTML='';
   document.getElementById('log-ev').innerHTML='';
+  document.getElementById('q-analysis-wrap').innerHTML='';
   document.getElementById('final-banner').style.display='none';
   document.getElementById('btn-next-q').style.display='none';
   document.getElementById('btn-new-game').style.display='none';
+  document.getElementById('log-quarter-title').textContent='QUARTER 1 — PLAY BY PLAY';
+  document.getElementById('live-quarter-label').textContent='Q1';
+
   simNextQuarter();
 }
 
@@ -1243,47 +1270,88 @@ function simNextQuarter(){
   const btnNew=document.getElementById('btn-new-game');
   if(btnNext) btnNext.style.display='none';
   if(btnNew)  btnNew.style.display='none';
-  document.getElementById('live-quarter-label').textContent='Q'+q;
-  document.getElementById('log-quarter-title').textContent='QUARTER '+q+' PLAY-BY-PLAY';
-  document.getElementById('log-ev').innerHTML='';
 
+  document.getElementById('live-quarter-label').textContent='Q'+q+' — IN PROGRESS';
+  document.getElementById('log-quarter-title').textContent='QUARTER '+q+' — PLAY BY PLAY';
+
+  // ── Generate quarter plays ──────────────────────────────────
   const events=[];
   let qMe=0,qCpu=0;
+  const myScorers={},cpuScorers={};   // name→points this quarter
+  let myTO=0,cpuTO=0,myFouls=0,cpuFouls=0;
+  let my2=0,my3=0,cpu2=0,cpu3=0;
   const PLAYS=rng(20,26);
+
   for(let p=0;p<PLAYS;p++){
     const mins=11-Math.floor(p*(12/PLAYS));
     const secs=rng(0,59);
     const ts='Q'+q+' '+mins+':'+(secs<10?'0':'')+secs;
     const myPoss=Math.random()<(GAME.myOVR/(GAME.myOVR+GAME.oppOVR));
-    const att=myPoss?GAME.myNames[rng(0,GAME.myNames.length-1)]:GAME.cpuNames[rng(0,GAME.cpuNames.length-1)];
-    const def=myPoss?GAME.cpuNames[rng(0,GAME.cpuNames.length-1)]:GAME.myNames[rng(0,GAME.myNames.length-1)];
+    const att=myPoss
+      ?GAME.myNames[rng(0,GAME.myNames.length-1)]
+      :GAME.cpuNames[rng(0,GAME.cpuNames.length-1)];
+    const def=myPoss
+      ?GAME.cpuNames[rng(0,GAME.cpuNames.length-1)]
+      :GAME.myNames[rng(0,GAME.myNames.length-1)];
     const sc=myPoss?GAME.myScoringRate:GAME.cpuScoringRate;
     const r=Math.random();
+
     if(r<sc){
       const pts=Math.random()<0.28?3:2;
       if(myPoss){
         qMe+=pts;
-        const msg=pts===3?[att+' from deep — SPLASH!',att+' steps back — 3!',att+' cold-blooded triple!'][rng(0,2)]:[att+' drives and finishes!',att+' post move — good!',att+' cuts — scores!'][rng(0,2)];
-        events.push({ts,txt:msg+' (+'+pts+')',cls:'sc'});
+        myScorers[att]=(myScorers[att]||0)+pts;
+        if(pts===3)my3++;else my2++;
+        const msg=pts===3
+          ?[att+' from deep — SPLASH!',att+' steps back — 3!',att+' cold triple!'][rng(0,2)]
+          :[att+' drives and finishes!',att+' post move — good!',att+' cuts to the rim!'][rng(0,2)];
+        events.push({ts,txt:msg+' (+'+pts+')',cls:'sc',scorer:att,pts,team:'me'});
       } else {
         qCpu+=pts;
-        const msg=pts===3?[att+' nails the 3!',att+' from the corner!',att+' drains it!'][rng(0,2)]:[att+' converts inside!',att+' layup — 2!',att+' mid-range — good!'][rng(0,2)];
-        events.push({ts,txt:msg+' (+'+pts+')',cls:'cs'});
+        cpuScorers[att]=(cpuScorers[att]||0)+pts;
+        if(pts===3)cpu3++;else cpu2++;
+        const msg=pts===3
+          ?[att+' nails the 3!',att+' from the corner!',att+' drains it!'][rng(0,2)]
+          :[att+' converts inside!',att+' layup — 2!',att+' mid-range — good!'][rng(0,2)];
+        events.push({ts,txt:msg+' (+'+pts+')',cls:'cs',scorer:att,pts,team:'cpu'});
       }
     } else if(r<sc+0.09){
-      events.push({ts,txt:att+' — '+['bad pass','travels','shot clock','out of bounds'][rng(0,3)]+' turnover',cls:'to'});
+      const turnType=['bad pass','travels','shot clock','out of bounds'][rng(0,3)];
+      if(myPoss)myTO++;else cpuTO++;
+      events.push({ts,txt:att+' — '+turnType+' turnover',cls:'to'});
     } else if(r<sc+0.13){
       const made=rng(0,2);
-      if(made>0){if(myPoss)qMe+=made;else qCpu+=made;}
+      if(myPoss){cpuFouls++;if(made>0)qMe+=made,myScorers[att]=(myScorers[att]||0)+made;}
+      else{myFouls++;if(made>0)qCpu+=made,cpuScorers[att]=(cpuScorers[att]||0)+made;}
       events.push({ts,txt:def+' fouls '+att+' — '+made+'/2 free throws',cls:'fo'});
     } else {
-      events.push({ts,txt:att+' misses the '+(Math.random()<0.35?'3-pointer':'mid-range')+(Math.random()<0.28?' — '+def+' rebounds':''),cls:''});
+      const miss=Math.random()<0.35?'3-pointer':'mid-range';
+      const reb=Math.random()<0.28;
+      events.push({ts,txt:att+' misses the '+miss+(reb?' — '+def+' with the rebound':''),cls:''});
     }
   }
-  GAME.scoreMe+=qMe;GAME.scoreCpu+=qCpu;
-  GAME.qScores.push({me:qMe,cpu:qCpu});
 
+  // Accumulate totals
+  GAME.scoreMe+=qMe; GAME.scoreCpu+=qCpu;
+  Object.entries(myScorers).forEach(([n,p])=>{GAME.myScorersTotal[n]=(GAME.myScorersTotal[n]||0)+p;});
+  Object.entries(cpuScorers).forEach(([n,p])=>{GAME.cpuScorersTotal[n]=(GAME.cpuScorersTotal[n]||0)+p;});
+  GAME.myTOTotal+=myTO; GAME.cpuTOTotal+=cpuTO;
+  GAME.myFoulsTotal+=myFouls; GAME.cpuFoulsTotal+=cpuFouls;
+  GAME.my2Total+=my2; GAME.my3Total+=my3;
+  GAME.cpu2Total+=cpu2; GAME.cpu3Total+=cpu3;
+  GAME.qScores.push({me:qMe,cpu:qCpu,myScorers,cpuScorers,myTO,cpuTO,myFouls,cpuFouls,my2,my3,cpu2,cpu3});
+
+  // ── Stream events into log ──────────────────────────────────
   const lev=document.getElementById('log-ev');
+
+  // Quarter divider header (not first quarter)
+  if(q>1){
+    const div=document.createElement('div');
+    div.style.cssText='font-family:"Bebas Neue",cursive;font-size:.9rem;letter-spacing:2px;color:var(--acc);padding:10px 4px 4px;border-top:2px solid var(--bdr);margin-top:8px;';
+    div.textContent='QUARTER '+q+' — PLAY BY PLAY';
+    lev.appendChild(div);
+  }
+
   let idx=0;
   function next(){
     if(idx<events.length){
@@ -1291,19 +1359,20 @@ function simNextQuarter(){
       const d=document.createElement('div');
       d.className='lev '+ev.cls;
       d.innerHTML='<span class="lt">'+ev.ts+'</span>'+ev.txt;
-      lev.appendChild(d);lev.scrollTop=lev.scrollHeight;
-      setTimeout(next,42);
+      lev.appendChild(d);
+      lev.scrollTop=lev.scrollHeight;
+      setTimeout(next,38);
     } else {
+      // All events streamed — update scoreboard
       document.getElementById('live-score-me').textContent=GAME.scoreMe;
       document.getElementById('live-score-cpu').textContent=GAME.scoreCpu;
+      document.getElementById('live-quarter-label').textContent='Q'+q+' DONE';
       updateQuarterTracker();
+      appendQuarterAnalysis(q);
+
       if(q<4){
-        const summary=document.createElement('div');
-        summary.style.cssText='font-family:"Bebas Neue",cursive;font-size:.82rem;letter-spacing:2px;color:var(--dim);padding:8px 4px 2px;border-top:1px solid var(--bdr);margin-top:6px;';
-        summary.textContent='END Q'+q+' — YOU '+GAME.scoreMe+' : CPU '+GAME.scoreCpu;
-        lev.appendChild(summary);lev.scrollTop=lev.scrollHeight;
         document.getElementById('next-q-num').textContent=q+1;
-        if(btnNext) btnNext.style.display='inline-block';
+        if(btnNext){btnNext.textContent='PLAY Q'+(q+1);btnNext.style.display='inline-block';}
       } else {
         resolveMatch();
       }
@@ -1314,19 +1383,109 @@ function simNextQuarter(){
 
 function updateQuarterTracker(){
   const el=document.getElementById('quarter-tracker');
-  el.innerHTML=GAME.qScores.map(function(qs,i){
-    const mec=qs.me>qs.cpu?'var(--acc)':qs.me<qs.cpu?'var(--red)':'var(--dim)';
-    const cpc=qs.cpu>qs.me?'var(--red)':qs.cpu<qs.me?'var(--grn)':'var(--dim)';
-    return '<div style="flex:1;min-width:56px;background:var(--surf2);border-radius:7px;padding:6px 8px;text-align:center;border:1px solid var(--bdr);">'
-      +'<div style="font-family:\'Bebas Neue\',cursive;font-size:.7rem;color:var(--dim);letter-spacing:1px;">Q'+(i+1)+'</div>'
-      +'<div style="font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:'+mec+';">'+qs.me+'</div>'
-      +'<div style="font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:'+cpc+';">'+qs.cpu+'</div>'
-      +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:.58rem;color:var(--dim);">YOU/CPU</div></div>';
-  }).join('');
+  // Build header row + data rows
+  let html='<div style="display:flex;flex-direction:column;gap:3px;flex:1;">';
+  // Row: Q labels
+  html+='<div style="display:flex;gap:5px;">';
+  html+='<div style="width:36px;font-family:\'Barlow Condensed\',sans-serif;font-size:.65rem;color:var(--dim);"></div>';
+  GAME.qScores.forEach((_,i)=>{
+    html+='<div style="flex:1;font-family:\'Bebas Neue\',cursive;font-size:.75rem;color:var(--dim);text-align:center;letter-spacing:1px;min-width:40px;">Q'+(i+1)+'</div>';
+  });
+  // Empty placeholder for remaining quarters
+  for(let i=GAME.qScores.length;i<4;i++){
+    html+='<div style="flex:1;font-family:\'Bebas Neue\',cursive;font-size:.75rem;color:var(--bdr);text-align:center;min-width:40px;">Q'+(i+1)+'</div>';
+  }
+  html+='<div style="width:42px;font-family:\'Bebas Neue\',cursive;font-size:.75rem;color:var(--dim);text-align:center;letter-spacing:1px;">TOT</div>';
+  html+='</div>';
+  // Row: Your scores
+  html+='<div style="display:flex;gap:5px;align-items:center;">';
+  html+='<div style="width:36px;font-family:\'Barlow Condensed\',sans-serif;font-size:.65rem;color:var(--acc);font-weight:700;">YOU</div>';
+  GAME.qScores.forEach(qs=>{
+    const c=qs.me>qs.cpu?'var(--acc)':qs.me<qs.cpu?'var(--red)':'var(--dim)';
+    html+='<div style="flex:1;font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:'+c+';text-align:center;background:var(--surf2);border-radius:5px;padding:3px 0;min-width:40px;">'+qs.me+'</div>';
+  });
+  for(let i=GAME.qScores.length;i<4;i++){
+    html+='<div style="flex:1;font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:var(--bdr);text-align:center;background:var(--surf2);border-radius:5px;padding:3px 0;min-width:40px;">—</div>';
+  }
+  html+='<div style="width:42px;font-family:\'Bebas Neue\',cursive;font-size:1.3rem;color:var(--acc);text-align:center;font-weight:900;">'+GAME.scoreMe+'</div>';
+  html+='</div>';
+  // Row: CPU scores
+  html+='<div style="display:flex;gap:5px;align-items:center;">';
+  html+='<div style="width:36px;font-family:\'Barlow Condensed\',sans-serif;font-size:.65rem;color:var(--red);font-weight:700;">CPU</div>';
+  GAME.qScores.forEach(qs=>{
+    const c=qs.cpu>qs.me?'var(--red)':qs.cpu<qs.me?'var(--grn)':'var(--dim)';
+    html+='<div style="flex:1;font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:'+c+';text-align:center;background:var(--surf2);border-radius:5px;padding:3px 0;min-width:40px;">'+qs.cpu+'</div>';
+  });
+  for(let i=GAME.qScores.length;i<4;i++){
+    html+='<div style="flex:1;font-family:\'Bebas Neue\',cursive;font-size:1.1rem;color:var(--bdr);text-align:center;background:var(--surf2);border-radius:5px;padding:3px 0;min-width:40px;">—</div>';
+  }
+  html+='<div style="width:42px;font-family:\'Bebas Neue\',cursive;font-size:1.3rem;color:var(--red);text-align:center;font-weight:900;">'+GAME.scoreCpu+'</div>';
+  html+='</div>';
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function appendQuarterAnalysis(q){
+  const qs=GAME.qScores[q-1];
+  const wrap=document.getElementById('q-analysis-wrap');
+  const qWon=qs.me>qs.cpu,qDraw=qs.me===qs.cpu;
+  const badge=qWon?'<span style="background:var(--grn);color:#fff;border-radius:4px;padding:1px 8px;font-size:.7rem;font-weight:700;margin-left:8px;">YOU WON Q'+q+'</span>'
+    :qDraw?'<span style="background:var(--gold);color:#000;border-radius:4px;padding:1px 8px;font-size:.7rem;font-weight:700;margin-left:8px;">Q'+q+' TIED</span>'
+    :'<span style="background:var(--red);color:#fff;border-radius:4px;padding:1px 8px;font-size:.7rem;font-weight:700;margin-left:8px;">CPU WON Q'+q+'</span>';
+
+  // Top scorer each side
+  const topMe=Object.entries(qs.myScorers).sort((a,b)=>b[1]-a[1])[0];
+  const topCpu=Object.entries(qs.cpuScorers).sort((a,b)=>b[1]-a[1])[0];
+
+  // Scorer list
+  const myList=Object.entries(qs.myScorers).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`<span style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;">${n} <b>${p}pts</b></span>`).join(' &nbsp;·&nbsp; ')||'<span style="color:var(--dim);font-size:.8rem;">No scores</span>';
+  const cpuList=Object.entries(qs.cpuScorers).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`<span style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;">${n} <b>${p}pts</b></span>`).join(' &nbsp;·&nbsp; ')||'<span style="color:var(--dim);font-size:.8rem;">No scores</span>';
+
+  const card=document.createElement('div');
+  card.style.cssText='background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:14px 16px;margin-bottom:10px;';
+  card.innerHTML=`
+    <div style="display:flex;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+      <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;">Q${q} ANALYSIS</div>
+      ${badge}
+      <div style="margin-left:auto;font-family:'Bebas Neue',cursive;font-size:1.3rem;">
+        <span style="color:var(--acc);">${qs.me}</span>
+        <span style="color:var(--dim);font-size:.9rem;"> — </span>
+        <span style="color:var(--red);">${qs.cpu}</span>
+      </div>
+    </div>
+    <!-- Stats table -->
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;margin-bottom:10px;">
+      <div style="text-align:right;color:var(--acc);font-weight:700;">${qs.my2+qs.my3}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;">FG MADE</div>
+      <div style="color:var(--red);font-weight:700;">${qs.cpu2+qs.cpu3}</div>
+
+      <div style="text-align:right;color:var(--acc);font-weight:700;">${qs.my3}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;">3-POINTERS</div>
+      <div style="color:var(--red);font-weight:700;">${qs.cpu3}</div>
+
+      <div style="text-align:right;color:var(--acc);font-weight:700;">${qs.myTO}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;">TURNOVERS</div>
+      <div style="color:var(--red);font-weight:700;">${qs.cpuTO}</div>
+
+      <div style="text-align:right;color:var(--acc);font-weight:700;">${qs.myFouls}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;">FOULS</div>
+      <div style="color:var(--red);font-weight:700;">${qs.cpuFouls}</div>
+    </div>
+    <!-- Scorers -->
+    <div style="border-top:1px solid var(--bdr);padding-top:8px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">YOUR SCORERS</div>
+      <div style="margin-bottom:7px;">${myList}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">CPU SCORERS</div>
+      <div>${cpuList}</div>
+    </div>
+    ${topMe?`<div style="margin-top:8px;border-top:1px solid var(--bdr);padding-top:7px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--gold);">Q${q} Star: <b>${topMe[0]}</b> with ${topMe[1]} points</div>`:''}
+  `;
+  wrap.appendChild(card);
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 function resolveMatch(){
-  // OT if tied
+  // OT if tied after Q4
   if(GAME.scoreMe===GAME.scoreCpu){
     const lev=document.getElementById('log-ev');
     const hd=document.createElement('div');
@@ -1343,7 +1502,7 @@ function resolveMatch(){
     document.getElementById('live-score-me').textContent=GAME.scoreMe;
     document.getElementById('live-score-cpu').textContent=GAME.scoreCpu;
   }
-  // OVR nudge
+  // OVR probability nudge
   if(GAME.scoreMe!==GAME.scoreCpu){
     const shouldWin=Math.random()<GAME.winChance;
     const winning=GAME.scoreMe>GAME.scoreCpu;
@@ -1352,6 +1511,7 @@ function resolveMatch(){
     document.getElementById('live-score-me').textContent=GAME.scoreMe;
     document.getElementById('live-score-cpu').textContent=GAME.scoreCpu;
   }
+
   const won=GAME.scoreMe>GAME.scoreCpu;
   const draw=GAME.scoreMe===GAME.scoreCpu;
   const lost=GAME.scoreMe<GAME.scoreCpu;
@@ -1367,16 +1527,82 @@ function resolveMatch(){
   updQProg('matches',1);updQProg('points',GAME.scoreMe);
   if(won)updQProg('wins',1);
   addXP(xpGain);updNav();doSave();
+
+  // Final banner
   const banner=document.getElementById('final-banner');
   const title=document.getElementById('final-result-title');
   const sub=document.getElementById('final-result-sub');
   const coinsEl=document.getElementById('final-coins-label');
   banner.style.display='block';
+  document.getElementById('live-quarter-label').textContent='FINAL';
+
   if(won){title.textContent='VICTORY!';title.style.color='var(--grn)';coinsEl.textContent='+'+coinDelta+' coins earned';coinsEl.style.color='var(--gold)';}
   else if(draw){title.textContent='DRAW!';title.style.color='var(--gold)';coinsEl.textContent='+'+coinDelta+' coins';coinsEl.style.color='var(--gold)';}
   else{title.textContent='DEFEAT';title.style.color='var(--red)';coinsEl.textContent=coinDelta+' coins lost';coinsEl.style.color='var(--red)';}
   sub.textContent='Final: YOU '+GAME.scoreMe+' — CPU '+GAME.scoreCpu;
+
+  // ── Full match analysis ────────────────────────────────────
+  const myTopScorer=Object.entries(GAME.myScorersTotal).sort((a,b)=>b[1]-a[1])[0];
+  const cpuTopScorer=Object.entries(GAME.cpuScorersTotal).sort((a,b)=>b[1]-a[1])[0];
+  const myAllScorers=Object.entries(GAME.myScorersTotal).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdr);"><span>${n}</span><span style="font-weight:700;color:var(--acc);">${p} pts</span></div>`).join('');
+  const cpuAllScorers=Object.entries(GAME.cpuScorersTotal).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdr);"><span>${n}</span><span style="font-weight:700;color:var(--red);">${p} pts</span></div>`).join('');
+
+  document.getElementById('match-analysis').innerHTML=`
+    <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;margin-bottom:12px;color:var(--txt);">FULL MATCH ANALYSIS</div>
+    <!-- Overall stats -->
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;margin-bottom:14px;">
+      <div style="text-align:right;font-weight:700;color:var(--acc);">${GAME.my2Total+GAME.my3Total}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;white-space:nowrap;">FIELD GOALS</div>
+      <div style="font-weight:700;color:var(--red);">${GAME.cpu2Total+GAME.cpu3Total}</div>
+
+      <div style="text-align:right;font-weight:700;color:var(--acc);">${GAME.my3Total}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;white-space:nowrap;">3-POINTERS</div>
+      <div style="font-weight:700;color:var(--red);">${GAME.cpu3Total}</div>
+
+      <div style="text-align:right;font-weight:700;color:var(--acc);">${GAME.my2Total}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;white-space:nowrap;">2-POINTERS</div>
+      <div style="font-weight:700;color:var(--red);">${GAME.cpu2Total}</div>
+
+      <div style="text-align:right;font-weight:700;color:var(--acc);">${GAME.myTOTotal}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;white-space:nowrap;">TURNOVERS</div>
+      <div style="font-weight:700;color:var(--red);">${GAME.cpuTOTotal}</div>
+
+      <div style="text-align:right;font-weight:700;color:var(--acc);">${GAME.myFoulsTotal}</div>
+      <div style="text-align:center;color:var(--dim);font-size:.7rem;letter-spacing:1px;white-space:nowrap;">FOULS</div>
+      <div style="font-weight:700;color:var(--red);">${GAME.cpuFoulsTotal}</div>
+    </div>
+    <!-- Quarter winners summary -->
+    <div style="margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',cursive;font-size:.85rem;letter-spacing:1px;color:var(--dim);margin-bottom:6px;">QUARTER WINNERS</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${GAME.qScores.map((qs,i)=>{
+          const w=qs.me>qs.cpu?'YOU':qs.cpu>qs.me?'CPU':'TIED';
+          const c=qs.me>qs.cpu?'var(--grn)':qs.cpu>qs.me?'var(--red)':'var(--gold)';
+          return `<div style="background:var(--surf2);border-radius:7px;padding:6px 10px;text-align:center;flex:1;min-width:60px;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:.75rem;color:var(--dim);">Q${i+1}</div>
+            <div style="font-family:'Bebas Neue',cursive;font-size:.8rem;color:${c};">${w}</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dim);">${qs.me}–${qs.cpu}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <!-- Scorers -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:.85rem;letter-spacing:1px;color:var(--acc);margin-bottom:6px;">YOUR SCORERS</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;">${myAllScorers||'<span style="color:var(--dim);">None</span>'}</div>
+        ${myTopScorer?`<div style="margin-top:7px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--gold);font-weight:700;">MVP: ${myTopScorer[0]} — ${myTopScorer[1]} pts</div>`:''}
+      </div>
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:.85rem;letter-spacing:1px;color:var(--red);margin-bottom:6px;">CPU SCORERS</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;">${cpuAllScorers||'<span style="color:var(--dim);">None</span>'}</div>
+        ${cpuTopScorer?`<div style="margin-top:7px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dim);font-weight:700;">CPU Best: ${cpuTopScorer[0]} — ${cpuTopScorer[1]} pts</div>`:''}
+      </div>
+    </div>
+  `;
+
   document.getElementById('btn-new-game').style.display='inline-block';
+  banner.scrollIntoView({behavior:'smooth',block:'start'});
   toast(won?'VICTORY! +'+coinDelta+' coins':draw?'DRAW! +'+coinDelta+' coins':'DEFEAT — '+Math.abs(coinDelta)+' coins lost',3500);
 }
 
