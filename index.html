@@ -6,11 +6,20 @@
 <title>BallKings</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE — classic script tag version (no npm, no build step)
+     Works directly on GitHub Pages with plain copy-paste.
+════════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+  // ┌─────────────────────────────────────────────────────────┐
+  // │  PASTE YOUR FIREBASE CONFIG HERE                        │
+  // │  console.firebase.google.com → your project →          │
+  // │  Project Settings → Your apps → Web app → Config       │
+  // └─────────────────────────────────────────────────────────┘
   const firebaseConfig = {
     apiKey:            "AIzaSyDNBobfxE0zbpJjP8Bh97Csox2nC6_A4QY",
     authDomain:        "ballkings.firebaseapp.com",
@@ -1245,7 +1254,8 @@ function startGame(){
   document.getElementById('log-ev').innerHTML='';
   document.getElementById('q-analysis-wrap').innerHTML='';
   document.getElementById('final-banner').style.display='none';
-  document.getElementById('btn-next-q').style.display='none';
+  const btnNextQ=document.getElementById('btn-next-q');
+  if(btnNextQ){ btnNextQ.innerHTML='PLAY Q<span id="next-q-num">2</span>'; btnNextQ.style.display='none'; btnNextQ.disabled=true; }
   document.getElementById('btn-new-game').style.display='none';
   document.getElementById('log-quarter-title').textContent='QUARTER 1 — PLAY BY PLAY';
   document.getElementById('live-quarter-label').textContent='Q1';
@@ -1259,7 +1269,7 @@ function simNextQuarter(){
   const q=GAME.currentQ;
   const btnNext=document.getElementById('btn-next-q');
   const btnNew=document.getElementById('btn-new-game');
-  if(btnNext) btnNext.style.display='none';
+  if(btnNext){ btnNext.style.display='none'; btnNext.disabled=true; }
   if(btnNew)  btnNew.style.display='none';
 
   document.getElementById('live-quarter-label').textContent='Q'+q+' — IN PROGRESS';
@@ -1362,8 +1372,11 @@ function simNextQuarter(){
       appendQuarterAnalysis(q);
 
       if(q<4){
-        document.getElementById('next-q-num').textContent=q+1;
-        if(btnNext){btnNext.textContent='PLAY Q'+(q+1);btnNext.style.display='inline-block';}
+        if(btnNext){
+          btnNext.innerHTML='PLAY Q<span id="next-q-num">'+(q+1)+'</span>';
+          btnNext.style.display='inline-block';
+          btnNext.disabled=false;
+        }
       } else {
         resolveMatch();
       }
