@@ -1168,6 +1168,23 @@ function rHome(){
       <button class="bsec"  onclick="nav('packs')">OPEN PACKS</button>
       <button class="bsec"  onclick="nav('market')">MARKET</button>
     </div>
+    ${(()=>{
+      const tier=Math.floor(S.level/5);
+      const pct=tier*20;
+      const nextLv=tier===0?5:(Math.ceil(S.level/5)*5);
+      const levelsAway=nextLv-S.level;
+      return tier>0
+        ?`<div style="background:var(--surf);border:1px solid var(--gold);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:1px;color:var(--gold);">COIN BONUS ACTIVE</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:var(--txt);">+${pct}% coins per win (Level ${S.level})</div>
+            <div style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dim);">Next +20% at Level ${nextLv}</div>
+          </div>`
+        :`<div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:1px;color:var(--dim);">COIN BONUS</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:var(--dim);">Reach Level 5 to unlock +20% win coins</div>
+            <div style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--acc);">${levelsAway} level${levelsAway!==1?'s':''} away</div>
+          </div>`;
+    })()}
     <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;color:var(--gold);margin-bottom:11px;">BEST CARDS</div>
     <div class="cgrid">
       ${S.collection.map(id=>gc(id)).filter(Boolean).sort((a,b)=>b.ovr-a.ovr).slice(0,6).map(c=>cardH(c,S.team.includes(c.id))).join('')}
@@ -1510,10 +1527,33 @@ function resolveMatch(){
   const won=GAME.scoreMe>GAME.scoreCpu;
   const draw=GAME.scoreMe===GAME.scoreCpu;
   const lost=GAME.scoreMe<GAME.scoreCpu;
-  let coinDelta,xpGain;
-  if(won){coinDelta=150+GAME.scoreMe*2;xpGain=80;}
-  else if(draw){coinDelta=30;xpGain=40;}
-  else{const pen=Math.round(20+Math.abs(GAME.scoreCpu-GAME.scoreMe)*2);coinDelta=-Math.min(pen,Math.floor(S.coins*0.15));xpGain=15;}
+
+  // ── Level bonus: every 5 levels adds +20% to WIN earnings ───
+  // Level 1-4  → 1.0×  (base)
+  // Level 5-9  → 1.2×
+  // Level 10-14→ 1.4×
+  // Level 15-19→ 1.6×  ... and so on, no cap
+  // LOSS penalty is never multiplied — always stays the same
+  const levelTier = Math.floor(S.level / 5);          // 0,1,2,3...
+  const winMultiplier = 1 + levelTier * 0.20;         // 1.0, 1.2, 1.4...
+  const bonusPct = Math.round(levelTier * 20);         // 0%, 20%, 40%...
+
+  let coinDelta, xpGain, baseCoins;
+  if(won){
+    baseCoins = 150 + GAME.scoreMe * 2;
+    coinDelta  = Math.round(baseCoins * winMultiplier);
+    xpGain = 80;
+  } else if(draw){
+    baseCoins = 30;
+    coinDelta  = Math.round(baseCoins * winMultiplier); // draw also benefits from level
+    xpGain = 40;
+  } else {
+    // Loss: fixed penalty — never scaled by level
+    const pen = Math.round(20 + Math.abs(GAME.scoreCpu - GAME.scoreMe) * 2);
+    coinDelta = -Math.min(pen, Math.floor(S.coins * 0.15));
+    baseCoins = coinDelta;
+    xpGain = 15;
+  }
   S.coins=Math.max(0,S.coins+coinDelta);
   S.stats.matches++;S.stats.points+=GAME.scoreMe;
   if(won)S.stats.wins++;
@@ -1531,9 +1571,24 @@ function resolveMatch(){
   banner.style.display='block';
   document.getElementById('live-quarter-label').textContent='FINAL';
 
-  if(won){title.textContent='VICTORY!';title.style.color='var(--grn)';coinsEl.textContent='+'+coinDelta+' coins earned';coinsEl.style.color='var(--gold)';}
-  else if(draw){title.textContent='DRAW!';title.style.color='var(--gold)';coinsEl.textContent='+'+coinDelta+' coins';coinsEl.style.color='var(--gold)';}
-  else{title.textContent='DEFEAT';title.style.color='var(--red)';coinsEl.textContent=coinDelta+' coins lost';coinsEl.style.color='var(--red)';}
+  if(won){
+    title.textContent='VICTORY!';
+    title.style.color='var(--grn)';
+    coinsEl.innerHTML='+'+coinDelta+' coins earned'
+      +(bonusPct>0?' <span style="color:var(--acc2);font-size:.85rem;">(Lv'+S.level+' bonus +'+bonusPct+'%)</span>':'');
+    coinsEl.style.color='var(--gold)';
+  } else if(draw){
+    title.textContent='DRAW!';
+    title.style.color='var(--gold)';
+    coinsEl.innerHTML='+'+coinDelta+' coins'
+      +(bonusPct>0?' <span style="color:var(--acc2);font-size:.85rem;">(Lv'+S.level+' bonus +'+bonusPct+'%)</span>':'');
+    coinsEl.style.color='var(--gold)';
+  } else {
+    title.textContent='DEFEAT';
+    title.style.color='var(--red)';
+    coinsEl.textContent=coinDelta+' coins lost';
+    coinsEl.style.color='var(--red)';
+  }
   sub.textContent='Final: YOU '+GAME.scoreMe+' — CPU '+GAME.scoreCpu;
 
   // ── Full match analysis ────────────────────────────────────
@@ -1598,7 +1653,7 @@ function resolveMatch(){
 
   document.getElementById('btn-new-game').style.display='inline-block';
   banner.scrollIntoView({behavior:'smooth',block:'start'});
-  toast(won?'VICTORY! +'+coinDelta+' coins':draw?'DRAW! +'+coinDelta+' coins':'DEFEAT — '+Math.abs(coinDelta)+' coins lost',3500);
+  toast(won?'VICTORY! +'+coinDelta+' coins'+(bonusPct>0?' (Lv'+S.level+' +'+bonusPct+'%)':''):draw?'DRAW! +'+coinDelta+' coins':'DEFEAT — '+Math.abs(coinDelta)+' coins lost',3500);
 }
 
 function startNewGame(){GAME=null;rPlay();}
