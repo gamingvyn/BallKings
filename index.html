@@ -6,11 +6,20 @@
 <title>BallKings</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE — classic script tag version (no npm, no build step)
+     Works directly on GitHub Pages with plain copy-paste.
+════════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+  // ┌─────────────────────────────────────────────────────────┐
+  // │  PASTE YOUR FIREBASE CONFIG HERE                        │
+  // │  console.firebase.google.com → your project →          │
+  // │  Project Settings → Your apps → Web app → Config       │
+  // └─────────────────────────────────────────────────────────┘
   const firebaseConfig = {
     apiKey:            "AIzaSyDNBobfxE0zbpJjP8Bh97Csox2nC6_A4QY",
     authDomain:        "ballkings.firebaseapp.com",
@@ -54,6 +63,7 @@
   --rb:#475569; --rr:#16a34a; --re:#2563eb;
   --ra:#7c3aed; --rp:#d97706; --rl:#ea580c; --ri:#db2777;
   --rm:#ffe066;
+  --rdiv:#00c8ff; --ret:#cc44ff; --roly:#ff7700; --rtr:#ffffff;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;background:var(--bg);color:var(--txt);
@@ -212,7 +222,61 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
   animation:cspin 5s linear infinite;}
 @keyframes cspin{to{transform:rotate(360deg);}}
 
-/* ── MASTER rarity ── OVR 100-102, ultra-exclusive */
+/* ── DIVINE (102-105) */
+.vdiv{background:linear-gradient(160deg,#001a3a,#003580);border:2px solid #00aaff;
+  box-shadow:0 0 28px rgba(0,170,255,.45),0 0 60px rgba(0,170,255,.15);}
+.vdiv .pc-vbadge{background:linear-gradient(90deg,#00aaff,#0055ff);color:#fff;font-weight:900;}
+.vdiv .pc-img{background:linear-gradient(160deg,#002255,#001133);}
+.vdiv .pc-ovr{color:#00aaff;text-shadow:0 0 10px rgba(0,170,255,.9);}
+.vdiv::before{content:'';position:absolute;inset:-2px;z-index:0;border-radius:15px;
+  background:conic-gradient(#00aaff 0deg,#0055ff 90deg,#00ddff 180deg,#0055ff 270deg,#00aaff 360deg);
+  animation:dspin 3.5s linear infinite;pointer-events:none;}
+.vdiv::after{content:'';position:absolute;inset:2px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#002255,#001133);pointer-events:none;}
+.vdiv .pc-vbadge,.vdiv .pc-ovr,.vdiv .pc-img,.vdiv .pc-foot,.vdiv .pc-inteam{position:relative;z-index:2;}
+@keyframes dspin{to{transform:rotate(360deg);}}
+
+/* ── ETERNAL (105-107) */
+.vete{background:linear-gradient(160deg,#0a001a,#1a0035);border:2px solid #cc00ff;
+  box-shadow:0 0 32px rgba(204,0,255,.5),0 0 70px rgba(204,0,255,.2);}
+.vete .pc-vbadge{background:linear-gradient(90deg,#cc00ff,#7700cc);color:#fff;font-weight:900;}
+.vete .pc-img{background:linear-gradient(160deg,#180028,#0d001a);}
+.vete .pc-ovr{color:#cc00ff;text-shadow:0 0 12px rgba(204,0,255,.9);}
+.vete::before{content:'';position:absolute;inset:-2px;z-index:0;border-radius:15px;
+  background:conic-gradient(#cc00ff 0deg,#7700cc 90deg,#ff00ff 180deg,#7700cc 270deg,#cc00ff 360deg);
+  animation:espin 3s linear infinite;pointer-events:none;}
+.vete::after{content:'';position:absolute;inset:2px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#180028,#0d001a);pointer-events:none;}
+.vete .pc-vbadge,.vete .pc-ovr,.vete .pc-img,.vete .pc-foot,.vete .pc-inteam{position:relative;z-index:2;}
+@keyframes espin{to{transform:rotate(360deg);}}
+
+/* ── OLYMPIAN (107-111) */
+.volym{background:linear-gradient(160deg,#1a0a00,#3a1500);border:3px solid #ff6600;
+  box-shadow:0 0 36px rgba(255,102,0,.55),0 0 80px rgba(255,102,0,.25),0 0 120px rgba(255,102,0,.08);}
+.volym .pc-vbadge{background:linear-gradient(90deg,#ff6600,#ff3300);color:#fff;font-weight:900;}
+.volym .pc-img{background:linear-gradient(160deg,#3a1500,#1a0a00);}
+.volym .pc-ovr{color:#ff8800;text-shadow:0 0 14px rgba(255,102,0,1);}
+.volym::before{content:'';position:absolute;inset:-3px;z-index:0;border-radius:16px;
+  background:conic-gradient(#ff6600 0deg,#ff3300 90deg,#ffaa00 180deg,#ff3300 270deg,#ff6600 360deg);
+  animation:ospin 2.5s linear infinite;pointer-events:none;}
+.volym::after{content:'';position:absolute;inset:3px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#3a1500,#1a0a00);pointer-events:none;}
+.volym .pc-vbadge,.volym .pc-ovr,.volym .pc-img,.volym .pc-foot,.volym .pc-inteam{position:relative;z-index:2;}
+@keyframes ospin{to{transform:rotate(360deg);}}
+
+/* ── TRANSCENDENT (111-115) — the absolute pinnacle */
+.vtra{background:linear-gradient(160deg,#0a0a0a,#1a1a1a);border:3px solid #ffffff;
+  box-shadow:0 0 40px rgba(255,255,255,.6),0 0 90px rgba(255,255,255,.25),0 0 140px rgba(200,200,255,.1);}
+.vtra .pc-vbadge{background:linear-gradient(90deg,#ffffff,#ccccff);color:#000;font-weight:900;letter-spacing:2px;}
+.vtra .pc-img{background:linear-gradient(160deg,#1a1a2a,#0a0a0a);}
+.vtra .pc-ovr{color:#fff;text-shadow:0 0 16px rgba(255,255,255,1),0 0 30px rgba(200,200,255,.8);}
+.vtra::before{content:'';position:absolute;inset:-3px;z-index:0;border-radius:16px;
+  background:conic-gradient(#ffffff 0deg,#aaaaff 60deg,#ffffff 120deg,#ffaaff 180deg,#ffffff 240deg,#aaffaa 300deg,#ffffff 360deg);
+  animation:tspin 2s linear infinite;pointer-events:none;}
+.vtra::after{content:'';position:absolute;inset:3px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#0f0f1a,#080808);pointer-events:none;}
+.vtra .pc-vbadge,.vtra .pc-ovr,.vtra .pc-img,.vtra .pc-foot,.vtra .pc-inteam{position:relative;z-index:2;}
+@keyframes tspin{to{transform:rotate(360deg);}}
 .vm {
   background:linear-gradient(160deg,#1a1200,#3a2800);
   border:2px solid var(--rm);
@@ -230,6 +294,62 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
 /* make card content sit above the pseudo overlays */
 .vm .pc-vbadge,.vm .pc-ovr,.vm .pc-img,.vm .pc-foot,.vm .pc-inteam{position:relative;z-index:2;}
 @keyframes mspin{to{transform:rotate(360deg);}}
+
+/* ── DIVINE 102-105 ── electric blue */
+.vdiv{background:linear-gradient(160deg,#001830,#002a50);border:2px solid var(--rdiv);
+  box-shadow:0 0 30px rgba(0,200,255,.55),0 0 70px rgba(0,180,255,.2);}
+.vdiv .pc-vbadge{background:linear-gradient(90deg,#00c8ff,#0080ff);color:#000;font-weight:900;}
+.vdiv .pc-img{background:linear-gradient(160deg,#002040,#001020);}
+.vdiv .pc-ovr{color:var(--rdiv);text-shadow:0 0 14px rgba(0,200,255,1);}
+.vdiv::before{content:'';position:absolute;inset:-2px;z-index:0;border-radius:15px;
+  background:conic-gradient(#00c8ff 0deg,#0040ff 90deg,#00c8ff 180deg,#00ffff 270deg,#00c8ff 360deg);
+  animation:divspin 2.5s linear infinite;pointer-events:none;}
+.vdiv::after{content:'';position:absolute;inset:2px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#001830,#001020);pointer-events:none;}
+.vdiv .pc-vbadge,.vdiv .pc-ovr,.vdiv .pc-img,.vdiv .pc-foot,.vdiv .pc-inteam{position:relative;z-index:2;}
+@keyframes divspin{to{transform:rotate(360deg);}}
+
+/* ── ETERNAL 105-107 ── deep violet/purple */
+.vet2{background:linear-gradient(160deg,#150025,#2a0050);border:2px solid var(--ret);
+  box-shadow:0 0 35px rgba(200,60,255,.6),0 0 80px rgba(160,0,255,.25);}
+.vet2 .pc-vbadge{background:linear-gradient(90deg,#cc44ff,#8800ff);color:#fff;font-weight:900;}
+.vet2 .pc-img{background:linear-gradient(160deg,#1e0040,#0f0020);}
+.vet2 .pc-ovr{color:var(--ret);text-shadow:0 0 16px rgba(200,60,255,1);}
+.vet2::before{content:'';position:absolute;inset:-3px;z-index:0;border-radius:16px;
+  background:conic-gradient(#cc44ff 0deg,#8800ff 90deg,#ff00cc 180deg,#8800ff 270deg,#cc44ff 360deg);
+  animation:etspin 2s linear infinite;pointer-events:none;}
+.vet2::after{content:'';position:absolute;inset:3px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#150025,#0a0015);pointer-events:none;}
+.vet2 .pc-vbadge,.vet2 .pc-ovr,.vet2 .pc-img,.vet2 .pc-foot,.vet2 .pc-inteam{position:relative;z-index:2;}
+@keyframes etspin{to{transform:rotate(360deg);}}
+
+/* ── OLYMPIAN 107-111 ── golden fire */
+.voly{background:linear-gradient(160deg,#1a0800,#3a1400);border:3px solid var(--roly);
+  box-shadow:0 0 40px rgba(255,120,0,.65),0 0 90px rgba(255,80,0,.3),0 0 140px rgba(255,60,0,.12);}
+.voly .pc-vbadge{background:linear-gradient(90deg,#ff7700,#ff3300);color:#fff;font-weight:900;}
+.voly .pc-img{background:linear-gradient(160deg,#2a0e00,#180600);}
+.voly .pc-ovr{color:var(--roly);text-shadow:0 0 18px rgba(255,120,0,1);}
+.voly::before{content:'';position:absolute;inset:-3px;z-index:0;border-radius:16px;
+  background:conic-gradient(#ff7700 0deg,#ff3300 60deg,#ffaa00 120deg,#ff3300 180deg,#ff7700 240deg,#ffcc00 300deg,#ff7700 360deg);
+  animation:olyspin 1.8s linear infinite;pointer-events:none;}
+.voly::after{content:'';position:absolute;inset:3px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#1a0800,#0e0400);pointer-events:none;}
+.voly .pc-vbadge,.voly .pc-ovr,.voly .pc-img,.voly .pc-foot,.voly .pc-inteam{position:relative;z-index:2;}
+@keyframes olyspin{to{transform:rotate(360deg);}}
+
+/* ── TRANSCENDENT 111-115 ── pure blinding white/rainbow */
+.vtra{background:linear-gradient(160deg,#0d0d1a,#1a1a2a);border:3px solid #fff;
+  box-shadow:0 0 50px rgba(255,255,255,.7),0 0 100px rgba(200,200,255,.4),0 0 160px rgba(255,200,255,.2);}
+.vtra .pc-vbadge{background:linear-gradient(90deg,#ffffff,#ccccff,#ffccff);color:#000;font-weight:900;}
+.vtra .pc-img{background:linear-gradient(160deg,#1a1a2a,#0a0a0a);}
+.vtra .pc-ovr{color:#fff;text-shadow:0 0 16px rgba(255,255,255,1),0 0 30px rgba(200,200,255,.8);}
+.vtra::before{content:'';position:absolute;inset:-3px;z-index:0;border-radius:16px;
+  background:conic-gradient(#ffffff 0deg,#aaaaff 60deg,#ffffff 120deg,#ffaaff 180deg,#ffffff 240deg,#aaffaa 300deg,#ffffff 360deg);
+  animation:tspin 2s linear infinite;pointer-events:none;}
+.vtra::after{content:'';position:absolute;inset:3px;z-index:1;border-radius:13px;
+  background:linear-gradient(160deg,#0f0f1a,#080808);pointer-events:none;}
+.vtra .pc-vbadge,.vtra .pc-ovr,.vtra .pc-img,.vtra .pc-foot,.vtra .pc-inteam{position:relative;z-index:2;}
+@keyframes tspin{to{transform:rotate(360deg);}}
 
 /* ═══════════════════════════════ FILTER BAR */
 .fbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
@@ -426,8 +546,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
     <button class="nb"     onclick="nav('cards')">Cards</button>
     <button class="nb"     onclick="nav('team')">Team</button>
     <button class="nb"     onclick="nav('market')">Market</button>
+    <button class="nb"     onclick="nav('store')">Store</button>
     <button class="nb"     onclick="nav('packs')">Packs</button>
     <button class="nb"     onclick="nav('quests')">Quests</button>
+    <button class="nb"     onclick="nav('achievements')">Badges</button>
     <div class="ncoins" id="ncoins">0</div>
     <div class="nlvl"   id="nlvl">LV1</div>
     <img id="nav-av" class="nav-av" src="" alt="" onclick="showUMenu()">
@@ -538,6 +660,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
       <button class="fb" onclick="fcoll('legend',this)">LEGEND</button>
       <button class="fb" onclick="fcoll('icon',this)">ICON</button>
       <button class="fb" onclick="fcoll('master',this)" style="border-color:var(--rm);color:var(--rm);">MASTER</button>
+      <button class="fb" onclick="fcoll('divine',this)" style="border-color:#00aaff;color:#00aaff;">DIVINE</button>
+      <button class="fb" onclick="fcoll('eternal',this)" style="border-color:#cc00ff;color:#cc00ff;">ETERNAL</button>
+      <button class="fb" onclick="fcoll('olympian',this)" style="border-color:#ff6600;color:#ff6600;">OLYMPIAN</button>
+      <button class="fb" onclick="fcoll('transcendent',this)" style="border-color:#fff;color:#fff;">TRANSCENDENT</button>
     </div>
     <div class="cgrid" id="cgrid"></div>
   </div>
@@ -567,14 +693,44 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
       <div class="mkt-timer" id="mkt-timer">5:00</div>
     </div>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--dim);margin-bottom:13px;">
-      Icon cards are ultra-rare — they may take hours or days to appear. Refreshes every 5 minutes.
+      Rare cards at <b style="color:var(--txt);">original prices</b> — no markup. Olympian cards cost tens of millions. Transcendent cards are <b style="color:var(--acc);">live market exclusive</b> and worth hundreds of millions. Refreshes every 5 minutes — even when you're offline.
     </div>
     <div class="mkt-grid" id="mkt-cards"></div>
     <div style="font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;color:var(--acc);margin:26px 0 11px;">SELL YOUR CARDS</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:11px;" id="sell-grid"></div>
   </div>
+  <!-- ── PLAYER STORE ── -->
+  <div id="s-store" class="sec">
+    <div class="sec-hdr">
+      <div class="ptitle" style="margin:0;">PLAYER <span>STORE</span></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--dim);max-width:360px;text-align:right;">
+        All players up to Olympian — always available. Prices are <b style="color:var(--acc);">+25% above Live Market.</b> Wait for the market refresh to buy at base price.
+      </div>
+    </div>
+    <div class="fbar" id="store-filt">
+      <button class="fb on" onclick="filterStore('all',this)">ALL</button>
+      <button class="fb" onclick="filterStore('base',this)">BASE</button>
+      <button class="fb" onclick="filterStore('rookie',this)">ROOKIE</button>
+      <button class="fb" onclick="filterStore('elite',this)">ELITE</button>
+      <button class="fb" onclick="filterStore('allstar',this)">ALL-STAR</button>
+      <button class="fb" onclick="filterStore('prime',this)">PRIME</button>
+      <button class="fb" onclick="filterStore('legend',this)">LEGEND</button>
+      <button class="fb" onclick="filterStore('icon',this)">ICON</button>
+      <button class="fb" onclick="filterStore('master',this)" style="border-color:var(--rm);color:var(--rm);">MASTER</button>
+      <button class="fb" onclick="filterStore('divine',this)" style="border-color:#00aaff;color:#00aaff;">DIVINE</button>
+      <button class="fb" onclick="filterStore('eternal',this)" style="border-color:#cc00ff;color:#cc00ff;">ETERNAL</button>
+      <button class="fb" onclick="filterStore('olympian',this)" style="border-color:#ff6600;color:#ff6600;">OLYMPIAN</button>
+    </div>
+    <div style="margin-bottom:14px;">
+      <input id="store-search" type="text" placeholder="Search player name..."
+        oninput="renderStore()"
+        style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:8px 14px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;width:100%;max-width:320px;outline:none;">
+    </div>
+    <div id="store-count" style="font-family:'Barlow Condensed',sans-serif;color:var(--dim);font-size:.82rem;margin-bottom:12px;"></div>
+    <div class="mkt-grid" id="store-grid"></div>
+  </div>
+
   <div id="s-packs"  class="sec">
-    <div class="ptitle">CARD <span>PACKS</span></div>
     <div class="pack-grid" id="pack-grid"></div>
     <div id="pack-res" style="display:none;margin-top:24px;">
       <div style="font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;color:var(--gold);margin-bottom:12px;">YOU GOT!</div>
@@ -588,6 +744,13 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
     <div style="font-family:'Bebas Neue',cursive;font-size:.95rem;letter-spacing:2px;color:var(--gold);margin:18px 0 9px;">WEEKLY</div>
     <div class="qgrid" id="wq"></div>
   </div>
+</div>
+
+<!-- ─── ACHIEVEMENTS SECTION ─────────────────────────────── -->
+<div id="s-achievements" class="sec" style="display:none;">
+  <div class="ptitle">ACHIEVEMENTS &amp; <span>BADGES</span></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;color:var(--dim);font-size:.85rem;margin-bottom:18px;" id="ach-summary"></div>
+  <div id="ach-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
 </div>
 
 <!-- card detail modal -->
@@ -617,38 +780,54 @@ html,body{height:100%;background:var(--bg);color:var(--txt);
 <!-- ══════════════════════════════════════════ SCRIPT -->
 <script>
 // ─── CONSTANTS ────────────────────────────────────────────────
-const VL   = {base:'BASE',rookie:'ROOKIE',elite:'ELITE',allstar:'ALL-STAR',prime:'PRIME',legend:'LEGEND',icon:'ICON',master:'MASTER'};
-const VCLS = {base:'vb',rookie:'vr',elite:'ve',allstar:'va',prime:'vp',legend:'vl',icon:'vi',master:'vm'};
-// OVR bands per variant
-// MASTER: 100-102 — displayed as-is (beyond normal 100 cap, reserved for GOATs only)
+const VL   = {base:'BASE',rookie:'ROOKIE',elite:'ELITE',allstar:'ALL-STAR',prime:'PRIME',legend:'LEGEND',icon:'ICON',master:'MASTER',divine:'DIVINE',eternal:'ETERNAL',olympian:'OLYMPIAN',transcendent:'TRANSCENDENT'};
+const VCLS = {base:'vb',rookie:'vr',elite:'ve',allstar:'va',prime:'vp',legend:'vl',icon:'vi',master:'vm',divine:'vdiv',eternal:'vet2',olympian:'voly',transcendent:'vtra'};
+// OVR bands — Master:100-102, Divine:102-105, Eternal:105-107, Olympian:107-111, Transcendent:111-115
 const VBAND = {
   base:   [30, 52], rookie:[48, 63], elite:[61, 74],
   allstar:[72, 83], prime:[80, 89],  legend:[87, 95],
   icon:   [96,100], master:[100,102],
+  divine:[102,105], eternal:[105,107], olympian:[107,111], transcendent:[111,115],
 };
-const VPRICE = {base:120,rookie:380,elite:1000,allstar:2600,prime:7000,legend:20000,icon:90000,master:500000};
+// ── VPRICE = the BASE live-market price for each variant ──────
+// Player Store charges base × 1.25 (premium for instant availability)
+// Transcendent is LIVE MARKET ONLY — never in Player Store
+const VPRICE = {
+  base:        200,         // 200 coins
+  rookie:      600,         // 600 coins
+  elite:       2000,        // 2K coins
+  allstar:     7000,        // 7K coins
+  prime:       20000,       // 20K coins
+  legend:      75000,       // 75K coins
+  icon:        250000,      // 250K coins
+  master:      1000000,     // 1 million
+  divine:      5000000,     // 5 million
+  eternal:     20000000,    // 20 million
+  olympian:    75000000,    // 75 million
+  transcendent:300000000,   // 300 million — live market only, once-in-a-lifetime find
+};
 
 // ─── PLAYER DATABASE ──────────────────────────────────────────
 // tier 1-10; hof=1 → all HOF variants; master=1 → also gets Master card
 // master flag is ONLY for the undisputed all-time GOATs (very selective)
 const RAW=[
-  {id:'jordan',   n:'Michael Jordan',          pos:'SG',era:'90s',    t:10,hof:1,master:1},
-  {id:'wilt',     n:'Wilt Chamberlain',         pos:'C', era:'60s',    t:10,hof:1,master:1},
-  {id:'lebron',   n:'LeBron James',             pos:'SF',era:'2010s',  t:10,hof:0,a:1,master:1},
-  {id:'kareem',   n:'Kareem Abdul-Jabbar',      pos:'C', era:'70s',    t:10,hof:1,master:1},
-  {id:'magic',    n:'Magic Johnson',            pos:'PG',era:'80s',    t:10,hof:1,master:1},
-  {id:'bird',     n:'Larry Bird',               pos:'SF',era:'80s',    t:10,hof:1,master:1},
-  {id:'kobe',     n:'Kobe Bryant',              pos:'SG',era:'2000s',  t:10,hof:1,master:1},
-  {id:'curry',    n:'Stephen Curry',            pos:'PG',era:'2010s',  t:10,hof:0,a:1,master:1},
+  {id:'jordan',   n:'Michael Jordan',          pos:'SG',era:'90s',    t:10,hof:1,master:1,divine:1,eternal:1,olympian:1,transcendent:1},
+  {id:'wilt',     n:'Wilt Chamberlain',         pos:'C', era:'60s',    t:10,hof:1,master:1,divine:1,eternal:1,olympian:1,transcendent:1},
+  {id:'lebron',   n:'LeBron James',             pos:'SF',era:'2010s',  t:10,hof:0,a:1,master:1,divine:1,eternal:1,olympian:1,transcendent:1},
+  {id:'kareem',   n:'Kareem Abdul-Jabbar',      pos:'C', era:'70s',    t:10,hof:1,master:1,divine:1,eternal:1,olympian:1},
+  {id:'magic',    n:'Magic Johnson',            pos:'PG',era:'80s',    t:10,hof:1,master:1,divine:1,eternal:1,olympian:1},
+  {id:'bird',     n:'Larry Bird',               pos:'SF',era:'80s',    t:10,hof:1,master:1,divine:1,eternal:1},
+  {id:'kobe',     n:'Kobe Bryant',              pos:'SG',era:'2000s',  t:10,hof:1,master:1,divine:1,eternal:1,olympian:1},
+  {id:'curry',    n:'Stephen Curry',            pos:'PG',era:'2010s',  t:10,hof:0,a:1,master:1,divine:1,eternal:1},
   {id:'jokic',    n:'Nikola Jokic',             pos:'C', era:'2020s',  t:10,hof:0,a:1},
   {id:'giannis',  n:'Giannis Antetokounmpo',    pos:'PF',era:'2020s',  t:10,hof:0,a:1},
   {id:'doncic',   n:'Luka Doncic',              pos:'PG',era:'2020s',  t:9, hof:0,a:1},
   {id:'kd',       n:'Kevin Durant',             pos:'SF',era:'2010s',  t:9, hof:0,a:1},
-  {id:'hakeem',   n:'Hakeem Olajuwon',          pos:'C', era:'90s',    t:9, hof:1,master:1},
-  {id:'duncan',   n:'Tim Duncan',               pos:'PF',era:'2000s',  t:9, hof:1,master:1},
-  {id:'dirk',     n:'Dirk Nowitzki',            pos:'PF',era:'2000s',  t:9, hof:1,master:1},
-  {id:'shaq',     n:"Shaquille O'Neal",         pos:'C', era:'2000s',  t:9, hof:1,master:1},
-  {id:'russell',  n:'Bill Russell',             pos:'C', era:'60s',    t:9, hof:1,master:1},
+  {id:'hakeem',   n:'Hakeem Olajuwon',          pos:'C', era:'90s',    t:9, hof:1,master:1,divine:1,eternal:1},
+  {id:'duncan',   n:'Tim Duncan',               pos:'PF',era:'2000s',  t:9, hof:1,master:1,divine:1},
+  {id:'dirk',     n:'Dirk Nowitzki',            pos:'PF',era:'2000s',  t:9, hof:1,master:1,divine:1},
+  {id:'shaq',     n:"Shaquille O'Neal",         pos:'C', era:'2000s',  t:9, hof:1,master:1,divine:1},
+  {id:'russell',  n:'Bill Russell',             pos:'C', era:'60s',    t:9, hof:1,master:1,divine:1},
   {id:'oscar',    n:'Oscar Robertson',          pos:'PG',era:'60s',    t:9, hof:1},
   {id:'embiid',   n:'Joel Embiid',              pos:'C', era:'2020s',  t:9, hof:0,a:1},
   {id:'sga',      n:'Shai Gilgeous-Alexander',  pos:'PG',era:'2020s',  t:8, hof:0,a:1},
@@ -752,7 +931,8 @@ const RAW=[
 ];
 
 // Variants per player
-// master=1 players get the full set including Master card
+// master/divine/eternal/olympian/transcendent flags assign ascending godtier cards
+// Only the truly all-time greats (GOATs) climb to the highest tiers
 function varFor(p){
   const base = p.hof
     ? ['base','rookie','elite','allstar','prime','legend','icon']
@@ -761,16 +941,25 @@ function varFor(p){
       : p.a
         ? ['base','rookie','elite','allstar','prime']
         : ['base','rookie','elite','allstar'];
-  if(p.master) base.push('master');
+  if(p.master)       base.push('master');
+  if(p.divine)       base.push('divine');
+  if(p.eternal)      base.push('eternal');
+  if(p.olympian)     base.push('olympian');
+  if(p.transcendent) base.push('transcendent');
   return base;
 }
 
 // Stat generation
 // master OVR can be 100-102, individual stats still cap at 100 per stat
 function rng(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-// For OVR display we allow 100-102 on master; individual stats cap at 100
+// Individual stats always cap at 100; OVR can exceed 100 for godtier variants
 function clampStat(v){return Math.max(30,Math.min(100,v));}
-function clampOvr(v,isMaster){return isMaster?Math.max(100,Math.min(102,v)):Math.max(30,Math.min(100,v));}
+const SUPER_VARIANTS=['master','divine','eternal','olympian','transcendent'];
+function clampOvr(v,variant){
+  if(!SUPER_VARIANTS.includes(variant)) return Math.max(30,Math.min(100,v));
+  const [lo,hi]=VBAND[variant];
+  return Math.max(lo,Math.min(hi,v));
+}
 function buildStats(pos,ovr){
   // Use min(ovr,100) as stat base so individual stats don't exceed 100
   const base=Math.min(100,ovr);
@@ -791,26 +980,40 @@ function buildStats(pos,ovr){
 // Build card DB — each variant gets its own independently rolled stats
 // so the same player genuinely plays differently across rarities
 const DB=[];
+// Ultra-rare variants have fixed prices regardless of player tier
+// Common variants scale ±15% by player tier quality
+const FIXED_PRICE_VARIANTS=['master','divine','eternal','olympian','transcendent'];
 RAW.forEach(p=>{
   varFor(p).forEach(v=>{
     const [lo,hi]=VBAND[v];
-    const isMaster=(v==='master');
+    const isSuper=SUPER_VARIANTS.includes(v);
     const frac=Math.min(1,(p.t-1)/9);
     const rawOvr=Math.round(lo+frac*(hi-lo)+rng(-2,2));
-    const ovr=clampOvr(rawOvr,isMaster);
-    // Each variant rolls its own stats independently — same player, different card = different strengths
+    const ovr=clampOvr(rawOvr,v);
     const stats=buildStats(p.pos,ovr);
+    // Fixed price for ultra-rare (these must always be high-value)
+    // Tier-scaled price for common variants
+    const price=FIXED_PRICE_VARIANTS.includes(v)
+      ? VPRICE[v]
+      : Math.round(VPRICE[v] * (0.85 + frac*0.30));
     DB.push({
       id:`${p.id}_${v}`, pid:p.id, name:p.n, pos:p.pos,
       era:p.era, variant:v, ovr,
-      stats,
-      price:Math.round(VPRICE[v]*(0.75+Math.min(ovr,100)/100)),
-      hof:!!p.hof, active:!!p.a, isMaster,
+      stats, price,
+      hof:!!p.hof, active:!!p.a, isSuper,
     });
   });
 });
 
 function gc(id){return DB.find(c=>c.id===id);}
+
+// Format large coin values nicely: 250,000,000 → "250M", 3,000,000 → "3M", 750,000 → "750K"
+function fmtCoins(n){
+  if(n>=1000000000) return (n/1000000000).toFixed(1).replace(/\.0$/,'')+'B';
+  if(n>=1000000)    return (n/1000000).toFixed(1).replace(/\.0$/,'')+'M';
+  if(n>=1000)       return (n/1000).toFixed(1).replace(/\.0$/,'')+'K';
+  return n.toLocaleString();
+}
 
 // ─── STARTER PACK — genuine 30-OVR base cards ────────────────
 // These are tier-3 players whose base OVR lands at 30-35
@@ -903,11 +1106,14 @@ function showUMenu(){document.getElementById('umenu').classList.add('on');}
 function closeUMenu(){document.getElementById('umenu').classList.remove('on');}
 
 // ─── NAV ──────────────────────────────────────────────────────
-const SECS=['home','play','cards','team','market','packs','quests'];
-const RENDERS={home:rHome,play:rPlay,cards:rCards,team:rTeam,market:rMarket,packs:rPacks,quests:rQuests};
+const SECS=['home','play','cards','team','market','store','packs','quests','achievements'];
+const RENDERS={home:rHome,play:rPlay,cards:rCards,team:rTeam,market:rMarket,store:renderStore,packs:rPacks,quests:rQuests,achievements:rAchievements};
 function nav(name){
-  SECS.forEach(s=>document.getElementById('s-'+s).classList.toggle('on',s===name));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.textContent.toLowerCase()===name));
+  SECS.forEach(s=>{
+    const el=document.getElementById('s-'+s);
+    if(el){ el.classList.toggle('on',s===name); el.style.display=(s===name)?'block':'none'; }
+  });
+  document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.textContent.toLowerCase().replace(' ','')===name||b.textContent.toLowerCase()===name));
   if(RENDERS[name]) RENDERS[name]();
 }
 
@@ -919,13 +1125,13 @@ function toast(m,d=2600){
 function closeMod(){document.getElementById('modal').classList.remove('on');}
 function closeRev(){document.getElementById('rev').classList.remove('on');}
 function updNav(){
-  document.getElementById('ncoins').textContent='Coins: '+S.coins.toLocaleString();
+  document.getElementById('ncoins').textContent='Coins: '+fmtCoins(S.coins);
   document.getElementById('nlvl').textContent='LV'+S.level;
 }
 function xpNeed(l){return l*500;}
 function addXP(n){
   S.xp+=n;
-  while(S.xp>=xpNeed(S.level)){S.xp-=xpNeed(S.level);S.level++;toast('LEVEL UP! Level '+S.level+'!',3000);}
+  while(S.xp>=xpNeed(S.level)){S.xp-=xpNeed(S.level);S.level++;toast('LEVEL UP! Level '+S.level+'! +4% coin bonus!',3200);checkAchievements();}
   updNav();doSave();
 }
 function teamOVR(){
@@ -1528,15 +1734,15 @@ function resolveMatch(){
   const draw=GAME.scoreMe===GAME.scoreCpu;
   const lost=GAME.scoreMe<GAME.scoreCpu;
 
-  // ── Level bonus: every 5 levels adds +20% to WIN earnings ───
-  // Level 1-4  → 1.0×  (base)
-  // Level 5-9  → 1.2×
-  // Level 10-14→ 1.4×
-  // Level 15-19→ 1.6×  ... and so on, no cap
+  // ── Level bonus: every level adds +4% to WIN earnings ──────
+  // Level 1  → 1.04×
+  // Level 5  → 1.20×
+  // Level 10 → 1.40×
+  // Level 25 → 2.00×  etc — no cap, grows with every level
   // LOSS penalty is never multiplied — always stays the same
-  const levelTier = Math.floor(S.level / 5);          // 0,1,2,3...
-  const winMultiplier = 1 + levelTier * 0.20;         // 1.0, 1.2, 1.4...
-  const bonusPct = Math.round(levelTier * 20);         // 0%, 20%, 40%...
+  const levelTier = S.level - 1;                       // 0 at Lv1, 1 at Lv2...
+  const winMultiplier = 1 + levelTier * 0.04;          // +4% per level
+  const bonusPct = Math.round(levelTier * 4);           // 0%, 4%, 8%...
 
   let coinDelta, xpGain, baseCoins;
   if(won){
@@ -1562,6 +1768,9 @@ function resolveMatch(){
   updQProg('matches',1);updQProg('points',GAME.scoreMe);
   if(won)updQProg('wins',1);
   addXP(xpGain);updNav();doSave();
+  // Track total coins earned for achievement
+  if(coinDelta>0){S.stats.coinsEarned=(S.stats.coinsEarned||0)+coinDelta;}
+  checkAchievements();
 
   // Final banner
   const banner=document.getElementById('final-banner');
@@ -1574,19 +1783,19 @@ function resolveMatch(){
   if(won){
     title.textContent='VICTORY!';
     title.style.color='var(--grn)';
-    coinsEl.innerHTML='+'+coinDelta+' coins earned'
+    coinsEl.innerHTML='+'+fmtCoins(coinDelta)+' coins earned'
       +(bonusPct>0?' <span style="color:var(--acc2);font-size:.85rem;">(Lv'+S.level+' bonus +'+bonusPct+'%)</span>':'');
     coinsEl.style.color='var(--gold)';
   } else if(draw){
     title.textContent='DRAW!';
     title.style.color='var(--gold)';
-    coinsEl.innerHTML='+'+coinDelta+' coins'
+    coinsEl.innerHTML='+'+fmtCoins(coinDelta)+' coins'
       +(bonusPct>0?' <span style="color:var(--acc2);font-size:.85rem;">(Lv'+S.level+' bonus +'+bonusPct+'%)</span>':'');
     coinsEl.style.color='var(--gold)';
   } else {
     title.textContent='DEFEAT';
     title.style.color='var(--red)';
-    coinsEl.textContent=coinDelta+' coins lost';
+    coinsEl.textContent=fmtCoins(coinDelta)+' coins lost';
     coinsEl.style.color='var(--red)';
   }
   sub.textContent='Final: YOU '+GAME.scoreMe+' — CPU '+GAME.scoreCpu;
@@ -1653,7 +1862,7 @@ function resolveMatch(){
 
   document.getElementById('btn-new-game').style.display='inline-block';
   banner.scrollIntoView({behavior:'smooth',block:'start'});
-  toast(won?'VICTORY! +'+coinDelta+' coins'+(bonusPct>0?' (Lv'+S.level+' +'+bonusPct+'%)':''):draw?'DRAW! +'+coinDelta+' coins':'DEFEAT — '+Math.abs(coinDelta)+' coins lost',3500);
+  toast(won?'VICTORY! +'+fmtCoins(coinDelta)+' coins'+(bonusPct>0?' (Lv'+S.level+' +'+bonusPct+'%)':''):draw?'DRAW! +'+fmtCoins(coinDelta)+' coins':'DEFEAT — '+fmtCoins(Math.abs(coinDelta))+' coins lost',3500);
 }
 
 function startNewGame(){GAME=null;rPlay();}
@@ -1760,61 +1969,106 @@ function asgn(id){
 }
 
 // ─── MARKET ───────────────────────────────────────────────────
+// ── Live market rarity weights (exact as specified) ──
+// base:35%, rookie:25%, elite:15%, allstar:10%, prime:7.5%, legend:4%,
+// icon:2%, master:0.8%, divine:0.4%, eternal:0.2%, olympian:0.08%, transcendent:0.02%
+// (remaining 0% rounding goes to base — totals ~100%)
+const MKT_THRESHOLDS=[
+  [0.0002,'transcendent'],
+  [0.0010,'olympian'],
+  [0.0030,'eternal'],
+  [0.0070,'divine'],
+  [0.0150,'master'],
+  [0.0350,'icon'],
+  [0.0750,'legend'],
+  [0.1500,'prime'],
+  [0.2500,'allstar'],
+  [0.4000,'elite'],
+  [0.6500,'rookie'],
+  [1.0000,'base'],
+];
+function pickMarketVariant(){
+  const r=Math.random();
+  for(const [thresh,v] of MKT_THRESHOLDS) if(r<thresh) return v;
+  return 'base';
+}
 function genMarket(){
-  // Hard cap: always exactly 3-5 cards, never more than 5
   const n=rng(3,5);
   const cards=[];
   let attempts=0;
-  while(cards.length<n && attempts<50){
+  while(cards.length<n && attempts<80){
     attempts++;
-    const r=Math.random();
-    // Heavily weighted toward low-quality cards
-    // master:0.1%, icon:0.3%, legend:1%, prime:3%, allstar:7%, elite:14%, rookie:30%, base:44.6%
-    let v;
-    if     (r<0.001) v='master';
-    else if(r<0.004) v='icon';
-    else if(r<0.014) v='legend';
-    else if(r<0.044) v='prime';
-    else if(r<0.114) v='allstar';
-    else if(r<0.254) v='elite';
-    else if(r<0.554) v='rookie';
-    else             v='base';
+    const v=pickMarketVariant();
     const pool=DB.filter(c=>c.variant===v);
     if(!pool.length) continue;
     const c=pool[rng(0,pool.length-1)];
-    // No duplicates — max 5 unique cards
     if(c && !cards.includes(c.id)) cards.push(c.id);
   }
-  S.marketCards=cards.slice(0,5); // enforce hard cap
+  S.marketCards=cards.slice(0,5);
+  S.marketLastRefresh=Date.now();
 }
+
 function rMarket(){
   const cards=S.marketCards.map(id=>gc(id)).filter(Boolean);
-  document.getElementById('mkt-cards').innerHTML=cards.map(c=>`
-    <div>
+  const ULTRA=['master','divine','eternal','olympian','transcendent'];
+
+  document.getElementById('mkt-cards').innerHTML = cards.length ? cards.map(c=>{
+    const ultra=ULTRA.includes(c.variant);
+    const storePremium=Math.round(c.price*1.25);
+    const inStore=STORE_MAX_VARIANTS.includes(c.variant); // transcendent excluded
+    const owned=S.collection.includes(c.id);
+
+    // Price colour based on rarity tier
+    const priceColor=
+      c.variant==='transcendent'?'color:#fff;font-size:1.3rem;text-shadow:0 0 12px #fff;':
+      c.variant==='olympian'?'color:var(--roly);font-size:1.25rem;':
+      c.variant==='eternal'?'color:var(--ret);font-size:1.2rem;':
+      c.variant==='divine'?'color:var(--rdiv);font-size:1.15rem;':
+      c.variant==='master'?'color:var(--rm);font-size:1.1rem;':
+      '';
+
+    return `<div>
       ${cardH(c)}
       <div class="mkt-pb">
-        <div class="mkt-lbl">PRICE</div>
-        <div class="mkt-price">Coins ${c.price.toLocaleString()}</div>
-        <button class="bbuy" onclick="buyC('${c.id}')" ${S.collection.includes(c.id)?'disabled':''}>
-          ${S.collection.includes(c.id)?'OWNED':'BUY'}
+        <div class="mkt-lbl" style="${ultra?'color:var(--gold);letter-spacing:1px;':''}">${ultra?'LIVE MARKET PRICE':'PRICE'}</div>
+        <div class="mkt-price" style="${priceColor}">${fmtCoins(c.price)}</div>
+        ${ultra&&inStore
+          ?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:.63rem;color:var(--dim);margin-top:2px;">
+              Player Store: <b style="color:var(--acc);">${fmtCoins(storePremium)}</b> <span style="color:var(--dim);">(+25%)</span>
+            </div>`:''}
+        ${c.variant==='transcendent'
+          ?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:.63rem;color:var(--gold);font-weight:700;margin-top:3px;letter-spacing:.5px;">
+              LIVE MARKET EXCLUSIVE
+            </div>`:''}
+        <button class="bbuy" onclick="buyC('${c.id}')" ${owned?'disabled':''}>
+          ${owned?'OWNED':'BUY — '+fmtCoins(c.price)}
         </button>
       </div>
-    </div>`).join('')
-    ||`<div style="color:var(--dim);font-family:'Barlow Condensed',sans-serif;padding:14px;">No listings right now — check back soon!</div>`;
+    </div>`;
+  }).join('') : `<div style="color:var(--dim);font-family:'Barlow Condensed',sans-serif;padding:14px;">No listings right now — check back in a few minutes!</div>`;
+
   const sell=S.collection.map(id=>gc(id)).filter(Boolean).sort((a,b)=>b.ovr-a.ovr);
   document.getElementById('sell-grid').innerHTML=sell.map(c=>`
     <div>
       ${cardH(c)}
-      <button class="bsell" onclick="sellC('${c.id}')">SELL — Coins ${Math.round(c.price*.6).toLocaleString()}</button>
+      <button class="bsell" onclick="sellC('${c.id}')">SELL — ${fmtCoins(Math.round(c.price*.6))}</button>
     </div>`).join('')
     ||`<div style="color:var(--dim);font-family:'Barlow Condensed',sans-serif;">Nothing to sell.</div>`;
 }
 function buyC(id){
   const c=gc(id);if(!c)return;
   if(S.collection.includes(id)){toast('Already owned!');return;}
-  if(S.coins<c.price){toast('Not enough coins!');return;}
+  if(S.coins<c.price){
+    toast('Need '+fmtCoins(c.price)+' coins — you have '+fmtCoins(S.coins));
+    return;
+  }
   S.coins-=c.price;S.collection.push(id);
+  S.stats.marketBuys=(S.stats.marketBuys||0)+1;
   doSave();updNav();rMarket();showRev(c);
+  checkAchievements();
+  const ultra=['master','divine','eternal','olympian','transcendent'].includes(c.variant);
+  if(ultra) toast('LEGENDARY PULL! '+c.name+' ('+VL[c.variant]+') for '+fmtCoins(c.price)+'!',4000);
+  else toast('Bought '+c.name+' for '+fmtCoins(c.price)+' coins!');
 }
 function sellC(id){
   const c=gc(id);if(!c)return;
@@ -1825,22 +2079,127 @@ function sellC(id){
   S.coins+=sp;doSave();updNav();rMarket();
   toast('Sold for '+sp.toLocaleString()+' coins!');
 }
+
+// ── Real-time market refresh using absolute UTC timestamps ────
+// This means even if the user is away for 20 minutes, they come back
+// and the market has already refreshed the correct number of times.
+const MARKET_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes in ms
+
+function checkMarketRefresh(){
+  const now=Date.now();
+  const last=S.marketLastRefresh||0;
+  const elapsed=now-last;
+  if(elapsed>=MARKET_INTERVAL_MS){
+    // Calculate how many 5-min periods have passed (skip multiple refreshes, just do one)
+    genMarket();
+    doSave();
+    toast('Market refreshed!');
+    if(document.getElementById('s-market').classList.contains('on')) rMarket();
+  }
+}
+
 let mktInt=null;
 function startMktTimer(){
   if(mktInt) clearInterval(mktInt);
+  // Check every second — uses absolute timestamps so offline time is accounted for
   mktInt=setInterval(()=>{
-    S.marketRefreshIn=Math.max(0,S.marketRefreshIn-1);
+    const now=Date.now();
+    const last=S.marketLastRefresh||now;
+    const remaining=Math.max(0, MARKET_INTERVAL_MS-(now-last));
+    const m=Math.floor(remaining/60000);
+    const s=Math.floor((remaining%60000)/1000);
     const el=document.getElementById('mkt-timer');
-    if(el){const m=Math.floor(S.marketRefreshIn/60),s=S.marketRefreshIn%60;el.textContent=`${m}:${s<10?'0':''}${s}`;}
-    if(S.marketRefreshIn<=0){
-      genMarket();S.marketRefreshIn=300;
+    if(el) el.textContent=m+':'+(s<10?'0':'')+s;
+    // Refresh when timer hits 0
+    if(remaining===0){
+      genMarket();
+      S.marketLastRefresh=now;
+      doSave();
+      toast('Market refreshed!');
       if(document.getElementById('s-market').classList.contains('on')) rMarket();
-      toast('Market refreshed!');doSave();
     }
   },1000);
 }
 
-// ─── PACKS ────────────────────────────────────────────────────
+// ─── PLAYER STORE ─────────────────────────────────────────────
+// Always available — every player up to Olympian at +25% markup
+// Transcendent cards ONLY appear in the live market — never here
+const STORE_MAX_VARIANTS = ['base','rookie','elite','allstar','prime','legend','icon','master','divine','eternal','olympian'];
+let storeFilt = 'all';
+
+function filterStore(f, btn){
+  storeFilt = f;
+  document.querySelectorAll('#store-filt .fb').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  renderStore();
+}
+
+function renderStore(){
+  const search=(document.getElementById('store-search')?.value||'').toLowerCase().trim();
+  // Transcendent is NEVER in the player store
+  const pool=DB.filter(c=>STORE_MAX_VARIANTS.includes(c.variant));
+  const filtered=pool.filter(c=>{
+    if(storeFilt!=='all'&&c.variant!==storeFilt) return false;
+    if(search&&!c.name.toLowerCase().includes(search)) return false;
+    return true;
+  }).sort((a,b)=>b.ovr-a.ovr);
+
+  document.getElementById('store-count').textContent=
+    filtered.length.toLocaleString()+' cards available'
+    +(storeFilt!=='all'?' ('+VL[storeFilt]+')':'')
+    +(search?' matching "'+search+'"':'')
+    +' · Transcendent only in Live Market';
+
+  if(!filtered.length){
+    document.getElementById('store-grid').innerHTML=
+      `<div style="color:var(--dim);font-family:'Barlow Condensed',sans-serif;padding:18px;">No cards found.</div>`;
+    return;
+  }
+
+  const ULTRA=['master','divine','eternal','olympian'];
+  document.getElementById('store-grid').innerHTML=filtered.map(c=>{
+    const storePrice=Math.round(c.price*1.25);
+    const owned=S.collection.includes(c.id);
+    const ultra=ULTRA.includes(c.variant);
+
+    const priceColor=
+      c.variant==='olympian'?'color:var(--roly);font-size:1.25rem;':
+      c.variant==='eternal'?'color:var(--ret);font-size:1.2rem;':
+      c.variant==='divine'?'color:var(--rdiv);font-size:1.15rem;':
+      c.variant==='master'?'color:var(--rm);font-size:1.1rem;':
+      '';
+
+    return `<div>
+      ${cardH(c)}
+      <div class="mkt-pb">
+        <div class="mkt-lbl" style="${ultra?'color:var(--acc);letter-spacing:1px;':''}">STORE PRICE (+25%)</div>
+        <div class="mkt-price" style="${priceColor}font-weight:900;">${fmtCoins(storePrice)}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.63rem;color:var(--dim);margin-top:2px;">
+          Live Market: <b style="color:var(--grn);">${fmtCoins(c.price)}</b>
+        </div>
+        <button class="bbuy" onclick="buyStore('${c.id}')" ${owned?'disabled':''}>
+          ${owned?'OWNED':'BUY — '+fmtCoins(storePrice)}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buyStore(id){
+  const c = gc(id); if(!c) return;
+  if(!STORE_MAX_VARIANTS.includes(c.variant)){
+    toast('This card is Live Market exclusive!'); return;
+  }
+  if(S.collection.includes(id)){ toast('Already owned!'); return; }
+  const storePrice = Math.round(c.price * 1.25);
+  if(S.coins < storePrice){ toast('Not enough coins! Need ' + fmtCoins(storePrice) + ' coins.'); return; }
+  S.coins -= storePrice;
+  S.collection.push(id);
+  S.stats.marketBuys = (S.stats.marketBuys||0) + 1;
+  doSave(); updNav(); renderStore(); showRev(c);
+  checkAchievements();
+  toast('Bought ' + c.name + ' (' + VL[c.variant] + ') for ' + fmtCoins(storePrice) + ' coins!');
+}
 const PACKS=[
   {id:'bronze',nm:'BRONZE PACK',  pr:300,    n:3,desc:'3 Base / Rookie cards',       pool:['base','rookie'],             bg:'linear-gradient(135deg,#1c0a00,#5a1e00)'},
   {id:'silver',nm:'SILVER PACK',  pr:1200,   n:4,desc:'4 cards — up to Elite',       pool:['base','rookie','elite'],     bg:'linear-gradient(135deg,#0d1928,#1d4ed8)'},
@@ -1855,7 +2214,7 @@ function rPacks(){
     <div class="pack-c" style="background:${p.bg};${p.gold?'border:2px solid #ffe066;box-shadow:0 0 24px rgba(255,224,102,.4);':''}" onclick="openPack('${p.id}')">
       <div style="font-size:2.4rem;margin-bottom:9px;">${p.gold?'&#128081;':'&#128246;'}</div>
       <div class="pack-name" style="${p.gold?'color:#ffe066;':''}">${p.nm}</div>
-      <div class="pack-price" style="${p.gold?'color:#ffe066;':''}">Coins ${p.pr.toLocaleString()}</div>
+      <div class="pack-price" style="${p.gold?'color:#ffe066;':''}">Coins ${fmtCoins(p.pr)}</div>
       <div class="pack-desc" style="${p.gold?'color:rgba(255,224,102,.7);':''}">${p.desc}</div>
     </div>`).join('');
   document.getElementById('pack-res').style.display='none';
@@ -1957,7 +2316,7 @@ function claimQ(id){
   const q=S.quests.find(q=>q.id===id);
   if(!q||q.claimed||q.progress<q.goal)return;
   q.claimed=true;S.coins+=q.reward;updNav();doSave();rQuests();
-  toast('Quest complete! +'+q.reward.toLocaleString()+' coins!');
+  toast('Quest complete! +'+fmtCoins(q.reward)+' coins!');
 }
 
 function rQuests(){
@@ -1977,7 +2336,7 @@ function rQuests(){
       <div class="qdesc">${q.desc}</div>
       <div class="qbar-w"><div class="qbar" style="width:${pct}%"></div></div>
       <div class="qfoot">
-        <div class="qrwd">Coins ${q.reward.toLocaleString()}</div>
+        <div class="qrwd">Coins ${fmtCoins(q.reward)}</div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:600;">
           ${q.claimed
             ?`<span style="color:var(--dim)">CLAIMED</span>`
@@ -2001,6 +2360,154 @@ function rQuests(){
     </div>`
     +S.quests.filter(q=>!q.daily).map(R).join('');
 }
+
+// ─── ACHIEVEMENTS & BADGES ────────────────────────────────────
+const ACH_DEFS = [
+  // Matches played
+  {id:'play1',   cat:'matches', title:'First Whistle',     desc:'Play your first match',           icon:'🏀', target:1,   type:'matches',  reward:200},
+  {id:'play10',  cat:'matches', title:'Getting Started',   desc:'Play 10 matches',                 icon:'🏀', target:10,  type:'matches',  reward:500},
+  {id:'play50',  cat:'matches', title:'Court Regular',     desc:'Play 50 matches',                 icon:'🏀', target:50,  type:'matches',  reward:1500},
+  {id:'play100', cat:'matches', title:'Veteran',           desc:'Play 100 matches',                icon:'🏀', target:100, type:'matches',  reward:4000},
+  {id:'play500', cat:'matches', title:'Basketball Addict', desc:'Play 500 matches',                icon:'🏀', target:500, type:'matches',  reward:20000},
+  // Wins
+  {id:'win1',    cat:'wins',    title:'First Blood',       desc:'Win your first match',            icon:'🏆', target:1,   type:'wins',     reward:300},
+  {id:'win10',   cat:'wins',    title:'On A Roll',         desc:'Win 10 matches',                  icon:'🏆', target:10,  type:'wins',     reward:800},
+  {id:'win50',   cat:'wins',    title:'Champion',          desc:'Win 50 matches',                  icon:'🏆', target:50,  type:'wins',     reward:3000},
+  {id:'win100',  cat:'wins',    title:'Dynasty',           desc:'Win 100 matches',                 icon:'🏆', target:100, type:'wins',     reward:10000},
+  {id:'win500',  cat:'wins',    title:'GOAT Coach',        desc:'Win 500 matches',                 icon:'🏆', target:500, type:'wins',     reward:60000},
+  // Points
+  {id:'pts100',  cat:'points',  title:'Scorer',            desc:'Score 100 total points',          icon:'🔥', target:100,  type:'points',   reward:400},
+  {id:'pts1k',   cat:'points',  title:'High Scorer',       desc:'Score 1,000 total points',        icon:'🔥', target:1000, type:'points',   reward:2000},
+  {id:'pts10k',  cat:'points',  title:'Point Machine',     desc:'Score 10,000 total points',       icon:'🔥', target:10000,type:'points',   reward:15000},
+  // Collection
+  {id:'col5',    cat:'collect', title:'Collector',         desc:'Own 5 cards',                     icon:'🃏', target:5,   type:'collection',reward:300},
+  {id:'col25',   cat:'collect', title:'Card Shark',        desc:'Own 25 cards',                    icon:'🃏', target:25,  type:'collection',reward:1000},
+  {id:'col100',  cat:'collect', title:'Card Museum',       desc:'Own 100 cards',                   icon:'🃏', target:100, type:'collection',reward:5000},
+  {id:'col500',  cat:'collect', title:'Archivist',         desc:'Own 500 cards',                   icon:'🃏', target:500, type:'collection',reward:25000},
+  // Rare cards
+  {id:'own_leg', cat:'rare',    title:'Legend Acquired',   desc:'Own any Legend card',             icon:'🌟', target:1,   type:'own_legend',reward:2000},
+  {id:'own_ico', cat:'rare',    title:'Icon Status',       desc:'Own any Icon card',               icon:'💎', target:1,   type:'own_icon',  reward:10000},
+  {id:'own_mst', cat:'rare',    title:'Master Class',      desc:'Own any Master card',             icon:'👑', target:1,   type:'own_master',reward:50000},
+  {id:'own_div', cat:'rare',    title:'Divine Touch',      desc:'Own any Divine card',             icon:'⚡', target:1,   type:'own_divine',reward:200000},
+  {id:'own_oly', cat:'rare',    title:'Olympian',          desc:'Own any Olympian card',           icon:'🔱', target:1,   type:'own_olympian',reward:1000000},
+  {id:'own_tra', cat:'rare',    title:'Transcendent',      desc:'Own a Transcendent card',         icon:'✨', target:1,   type:'own_transcendent',reward:5000000},
+  // Levels
+  {id:'lv5',     cat:'level',   title:'Rising Star',       desc:'Reach Level 5',                   icon:'⭐', target:5,   type:'level',    reward:1000},
+  {id:'lv10',    cat:'level',   title:'Pro',               desc:'Reach Level 10',                  icon:'⭐', target:10,  type:'level',    reward:3000},
+  {id:'lv25',    cat:'level',   title:'Elite Coach',       desc:'Reach Level 25',                  icon:'⭐', target:25,  type:'level',    reward:10000},
+  {id:'lv50',    cat:'level',   title:'Hall of Fame Coach',desc:'Reach Level 50',                  icon:'⭐', target:50,  type:'level',    reward:50000},
+  // Coins
+  {id:'rich1',   cat:'coins',   title:'Getting Paid',      desc:'Earn 10,000 coins total',         icon:'💰', target:10000,  type:'coins_earned',reward:500},
+  {id:'rich2',   cat:'coins',   title:'Baller',            desc:'Earn 100,000 coins total',        icon:'💰', target:100000, type:'coins_earned',reward:5000},
+  {id:'rich3',   cat:'coins',   title:'Millionaire',       desc:'Earn 1,000,000 coins total',      icon:'💰', target:1000000,type:'coins_earned',reward:30000},
+  // Market
+  {id:'mkt1',    cat:'market',  title:'Trader',            desc:'Buy 5 cards from the market',     icon:'📈', target:5,   type:'market_buys',reward:800},
+  {id:'mkt2',    cat:'market',  title:'Market Shark',      desc:'Buy 25 cards from the market',    icon:'📈', target:25,  type:'market_buys',reward:5000},
+  // Special
+  {id:'draw1',   cat:'special', title:'Gentleman's Game', desc:'Draw a match',                    icon:'🤝', target:1,   type:'draws',    reward:500},
+  {id:'comeback',cat:'special', title:'Never Give Up',     desc:'Win after being down at half',    icon:'💪', target:1,   type:'comebacks',reward:2000},
+];
+
+function getAchievementProgress(ach){
+  const s=S.stats;
+  const col=S.collection;
+  switch(ach.type){
+    case 'matches':      return s.matches||0;
+    case 'wins':         return s.wins||0;
+    case 'points':       return s.points||0;
+    case 'collection':   return col.length;
+    case 'level':        return S.level;
+    case 'coins_earned': return S.stats.coinsEarned||0;
+    case 'market_buys':  return S.stats.marketBuys||0;
+    case 'draws':        return s.draws||0;
+    case 'comebacks':    return s.comebacks||0;
+    case 'own_legend':   return col.some(id=>{const c=gc(id);return c&&c.variant==='legend';})?1:0;
+    case 'own_icon':     return col.some(id=>{const c=gc(id);return c&&c.variant==='icon';})?1:0;
+    case 'own_master':   return col.some(id=>{const c=gc(id);return c&&c.variant==='master';})?1:0;
+    case 'own_divine':   return col.some(id=>{const c=gc(id);return c&&c.variant==='divine';})?1:0;
+    case 'own_olympian': return col.some(id=>{const c=gc(id);return c&&c.variant==='olympian';})?1:0;
+    case 'own_transcendent': return col.some(id=>{const c=gc(id);return c&&c.variant==='transcendent';})?1:0;
+    default: return 0;
+  }
+}
+
+function checkAchievements(){
+  if(!S.achievements) S.achievements={};
+  let anyNew=false;
+  ACH_DEFS.forEach(ach=>{
+    if(S.achievements[ach.id]==='claimed') return;
+    const prog=getAchievementProgress(ach);
+    if(prog>=ach.target && S.achievements[ach.id]!=='earned'){
+      S.achievements[ach.id]='earned';
+      anyNew=true;
+      // Auto-notify
+      setTimeout(()=>toast(ach.icon+' Achievement Unlocked: '+ach.title+'!',3500),300);
+    }
+  });
+  if(anyNew) doSave();
+}
+
+function claimAch(id){
+  if(!S.achievements) S.achievements={};
+  if(S.achievements[id]!=='earned') return;
+  const ach=ACH_DEFS.find(a=>a.id===id);
+  if(!ach) return;
+  S.achievements[id]='claimed';
+  S.coins+=ach.reward;
+  updNav(); doSave(); rAchievements();
+  toast(ach.icon+' Claimed! +'+fmtCoins(ach.reward)+' coins!',3000);
+}
+
+function rAchievements(){
+  checkAchievements();
+  if(!S.achievements) S.achievements={};
+  const total=ACH_DEFS.length;
+  const earned=ACH_DEFS.filter(a=>S.achievements[a.id]==='earned'||S.achievements[a.id]==='claimed').length;
+  const claimed=ACH_DEFS.filter(a=>S.achievements[a.id]==='claimed').length;
+  document.getElementById('ach-summary').textContent=earned+'/'+total+' achievements unlocked  ·  '+claimed+' claimed';
+
+  const CAT_ORDER=['matches','wins','points','collect','rare','level','coins','market','special'];
+  const CAT_LABELS={matches:'MATCHES',wins:'WINS',points:'SCORING',collect:'COLLECTION',rare:'RARE CARDS',level:'LEVELING',coins:'WEALTH',market:'MARKET',special:'SPECIAL'};
+
+  let html='';
+  CAT_ORDER.forEach(cat=>{
+    const achs=ACH_DEFS.filter(a=>a.cat===cat);
+    if(!achs.length) return;
+    html+='<div style="grid-column:1/-1;font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:2px;color:var(--acc2);margin:14px 0 6px;">'+CAT_LABELS[cat]+'</div>';
+    achs.forEach(ach=>{
+      const prog=getAchievementProgress(ach);
+      const pct=Math.min(100,Math.round(prog/ach.target*100));
+      const status=S.achievements[ach.id]||'locked';
+      const done=status==='earned'||status==='claimed';
+      const locked=prog<ach.target;
+      const bg=status==='claimed'?'var(--surf2)':done?'var(--surf)':'var(--surf)';
+      const borderC=status==='claimed'?'var(--grn)':done?'var(--gold)':'var(--bdr)';
+      const opacity=locked&&status!=='earned'&&status!=='claimed'?'.6':'1';
+      html+=`<div style="background:${bg};border:1px solid ${borderC};border-radius:12px;padding:14px;opacity:${opacity};">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="font-size:1.6rem;width:36px;text-align:center;${locked&&!done?'filter:grayscale(1);opacity:.5':''};">${ach.icon}</div>
+          <div style="flex:1;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:1px;${done?'color:var(--gold)':''};">${ach.title}</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dim);">${ach.desc}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:.85rem;color:var(--gold);">+${fmtCoins(ach.reward)}</div>
+            ${status==='earned'?`<button onclick="claimAch('${ach.id}')" style="background:var(--acc);border:none;border-radius:6px;color:#fff;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;margin-top:3px;">CLAIM</button>`:''}
+            ${status==='claimed'?'<div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--grn);font-weight:700;">CLAIMED</div>':''}
+          </div>
+        </div>
+        <div style="background:var(--bdr);border-radius:3px;height:5px;overflow:hidden;">
+          <div style="height:100%;background:${done?'var(--grn)':'linear-gradient(90deg,var(--acc2),var(--acc))'};width:${pct}%;transition:width .5s;"></div>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:var(--dim);margin-top:4px;">
+          ${done?'COMPLETE':prog.toLocaleString()+' / '+ach.target.toLocaleString()}
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('ach-grid').innerHTML=html;
+}
+
 </script>
 </body>
 </html>
