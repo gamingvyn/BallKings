@@ -37,6 +37,11 @@
     return snap.exists ? snap.data() : null;
   };
 
+  // Stubs — replaced immediately when game JS loads below
+  // These prevent "not a function" errors if auth fires before game script runs
+  window.onUserSignedIn  = window.onUserSignedIn  || function(u){ console.log('Auth: signed in', u.email); };
+  window.onUserSignedOut = window.onUserSignedOut || function(){ console.log('Auth: signed out'); };
+
   // Auth state listener — fires when user signs in or out
   auth.onAuthStateChanged(user => {
     if (user) { window._bkUser = user; window.onUserSignedIn(user); }
@@ -1059,7 +1064,7 @@ async function doSave(){
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────
-window.onUserSignedIn=async function(user){
+window.onUserSignedIn = async function(user){
   USER=user;
   document.getElementById('signin').style.display='none';
   document.getElementById('app').style.display='block';
@@ -1071,7 +1076,7 @@ window.onUserSignedIn=async function(user){
   await loadUser(user);
   updNav();startMktTimer();nav('home');
 };
-window.onUserSignedOut=function(){
+window.onUserSignedOut = function(){
   USER=null;
   document.getElementById('app').style.display='none';
   document.getElementById('signin').style.display='flex';
@@ -1079,17 +1084,55 @@ window.onUserSignedOut=function(){
   document.getElementById('signin-spin').style.display='none';
 };
 async function doSignIn(){
-  document.getElementById('signin-err').textContent='';
-  document.getElementById('signin-spin').style.display='block';
-  try{await window._bkSignIn();}
-  catch(e){
-    document.getElementById('signin-spin').style.display='none';
-    document.getElementById('signin-err').textContent=
-      e.code==='auth/popup-closed-by-user'?'Sign-in cancelled.':
-      e.code==='auth/network-request-failed'?'Network error.':
-      'Sign-in failed: '+e.message;
+  const errEl=document.getElementById('signin-err');
+  const spinEl=document.getElementById('signin-spin');
+  errEl.textContent='';
+  spinEl.style.display='block';
+  spinEl.textContent='Opening Google sign-in...';
+
+  // Guard: make sure Firebase helpers loaded correctly
+  if(typeof window._bkSignIn !== 'function'){
+    spinEl.style.display='none';
+    errEl.textContent='Firebase not loaded — check your connection and refresh.';
+    return;
+  }
+
+  try{
+    await window._bkSignIn();
+    // onAuthStateChanged fires automatically and calls onUserSignedIn
+  } catch(e){
+    spinEl.style.display='none';
+    console.error('Sign-in error:', e.code, e.message);
+    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-cancelled-by-user'||e.code==='auth/cancelled-popup-request'){
+      errEl.textContent='Popup was blocked. Trying redirect...';
+      try{
+        await firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+      } catch(e2){ errEl.textContent='Sign-in failed: '+e2.message; }
+    } else if(e.code==='auth/popup-closed-by-user'){
+      errEl.textContent='Sign-in cancelled — window was closed.';
+    } else if(e.code==='auth/network-request-failed'){
+      errEl.textContent='Network error. Check your connection and try again.';
+    } else if(e.code==='auth/unauthorized-domain'){
+      errEl.textContent='Domain not authorized. Add your GitHub Pages URL in Firebase Console → Authentication → Settings → Authorized Domains.';
+    } else if(e.code==='auth/invalid-api-key'||e.code==='auth/configuration-not-found'){
+      errEl.textContent='Firebase config error. Make sure Google Sign-In is enabled in Firebase Console → Authentication → Sign-in method.';
+    } else {
+      errEl.textContent='Sign-in failed: '+(e.message||e.code||'unknown error');
+    }
   }
 }
+
+// Handle redirect result on page load (fallback for popup-blocked browsers)
+window.addEventListener('load',()=>{
+  if(typeof firebase==='undefined') return;
+  firebase.auth().getRedirectResult().then(result=>{
+    // Handled automatically by onAuthStateChanged
+  }).catch(e=>{
+    if(e.code&&e.code!=='auth/no-auth-event'){
+      console.error('Redirect result error:',e);
+    }
+  });
+});
 async function doSignOut(){
   closeUMenu();await window._bkSignOut();
 }
