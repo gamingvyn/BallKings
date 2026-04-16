@@ -28,7 +28,7 @@
   const provider = new firebase.auth.GoogleAuthProvider();
 
   // Expose helpers used by the game
-  window._bkSignIn  = () => auth.signInWithPopup(provider);
+  window._bkSignIn  = () => auth.signInWithPopup (provider);
   window._bkSignOut = () => auth.signOut();
   window._bkSave    = (uid, data) =>
     db.collection("users").doc(uid).set(data, { merge: true });
